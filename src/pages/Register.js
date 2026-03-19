@@ -81,9 +81,9 @@ const Register = () => {
       
       const loginResponse = await axiosInstance.post('/auth/login/', loginData);
       
-      // Show OTP screen
+      // 🟢 NAYA CODE: Ab hum password bhi parde ke piche bhej rahe hain
       alert('✅ Registration successful! OTP sent to your email.');
-      navigate('/login', { state: { email: loginResponse.data.email, autoLogin: true } });
+      navigate('/login', { state: { email: loginResponse.data.email, password: submitData.password, autoLogin: true } });
       
     } catch (err) {
       console.error('Registration error:', err);

@@ -18,9 +18,15 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 🟢 FIXED: Registration se aate waqt password ko bhi save karega
   useEffect(() => {
     if (location.state?.email && location.state?.autoLogin) {
       setEmail(location.state.email);
+      setFormData(prev => ({
+        ...prev,
+        identifier: location.state.email,
+        password: location.state.password || '' // password yahan save ho gaya
+      }));
       setStep(2);
     }
   }, [location]);
@@ -80,17 +86,19 @@ const Login = () => {
     }
   };
 
+  // 🟢 FIXED: Ab Resend dabane par password gayab nahi hoga
   const handleResendOTP = async () => {
     setLoading(true);
+    setError('');
     try {
       await axiosInstance.post('/auth/login/', {
-        identifier: formData.identifier,
-        password: formData.password
+        identifier: formData.identifier || email,
+        password: formData.password 
       });
-      alert('✅ New OTP generated! Check backend terminal.');
+      alert('✅ A new OTP has been sent to your registered email.');
       setFormData({ ...formData, otp: '' });
     } catch (err) {
-      setError('Failed to resend OTP');
+      setError('Failed to resend OTP. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -198,14 +206,11 @@ const Login = () => {
         <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'system-ui' }}>
           Enter OTP
         </h1>
-        <p style={{ color: '#6B7280', marginBottom: '1rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
+        <p style={{ color: '#6B7280', marginBottom: '1.5rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
           A 6-digit code has been generated for<br/><strong>{email}</strong>
         </p>
         
-        <div style={{ fontSize: '0.85rem', backgroundColor: '#FEF3C7', padding: '0.75rem', border: '2px solid #F59E0B', marginBottom: '1.5rem', fontFamily: 'monospace', lineHeight: '1.5' }}>
-          ⚠️ <strong>Development Mode:</strong><br/>
-          Check the <strong>backend terminal window</strong> for your OTP code
-        </div>
+        {/* 🟢 FIXED: Dev Mode Message Hata Diya Hai */}
 
         <form onSubmit={handleOTPSubmit}>
           <div style={{ marginBottom: '1rem' }}>
