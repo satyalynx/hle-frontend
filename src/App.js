@@ -76,7 +76,7 @@ const AppRoutes = () => {
       <Route path="/payment-history" element={<ProtectedRoute><PaymentHistory /></ProtectedRoute>} />
       
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+      <Route path="/about" element={<About />} />
       
       <Route path="/users" element={
         (user?.role === 'warden' || user?.role === 'admin') 

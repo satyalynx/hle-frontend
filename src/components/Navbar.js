@@ -81,6 +81,7 @@ const Navbar = () => {
               <Link to="/food" style={linkStyle}>Food Hub</Link>
               <Link to="/complaints" style={linkStyle}>Complaints</Link>
               <Link to="/notices" style={linkStyle}>Notices</Link>
+              <Link to="/about" style={linkStyle}>About</Link>
             </div>
           )}
         </div>
