@@ -76,7 +76,6 @@ const AppRoutes = () => {
       <Route path="/payment-history" element={<ProtectedRoute><PaymentHistory /></ProtectedRoute>} />
       
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/about" element={<About />} />
       
       <Route path="/users" element={
         (user?.role === 'warden' || user?.role === 'admin') 
@@ -91,8 +90,8 @@ const AppRoutes = () => {
       <Route path="/generate-report" element={<ProtectedRoute><GenerateReport /></ProtectedRoute>} />
       <Route path="/emergency-sos" element={<ProtectedRoute><EmergencySOS /></ProtectedRoute>} />
       <Route path="/heatmap" element={<ProtectedRoute><MaintenanceHeatmap /></ProtectedRoute>} />
-      <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
-      <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/about" element={<About />} />
       
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Homepage />} />
     </Routes>
