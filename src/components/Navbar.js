@@ -50,7 +50,7 @@ const Navbar = () => {
         }
       } catch (error) { setIsEmergencyActive(false); }
     };
-    };
+    
     const intervalId = setInterval(checkEmergencies, 3000);
     return () => clearInterval(intervalId);
   }, [user]);
