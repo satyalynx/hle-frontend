@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axiosInstance from '../api/axios'; // 🟢 Ye add kar lena upar
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isEmergencyActive, setIsEmergencyActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
 
@@ -33,6 +35,19 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // 🚨 THE NINJA POLLING FOR BELL
+  useEffect(() => {
+    if (!user) return;
+    const checkEmergencies = async () => {
+      try {
+        const res = await axiosInstance.get('/emergency/active');
+        setIsEmergencyActive(res.data?.active || false);
+      } catch (error) { setIsEmergencyActive(false); }
+    };
+    const intervalId = setInterval(checkEmergencies, 3000);
+    return () => clearInterval(intervalId);
+  }, [user]);
 
   return (
     <nav style={{ 
@@ -130,12 +145,19 @@ const Navbar = () => {
           {user ? (
             <>
               {/* Notification Bell */}
-              <Link to="/notifications" style={{ position: 'relative', textDecoration: 'none', fontSize: '1.4rem', color: '#4B5563', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => e.target.style.color = '#000'}
-                onMouseLeave={(e) => e.target.style.color = '#4B5563'}
-              >
+              <Link to="/notifications" style={{ 
+                position: 'relative', textDecoration: 'none', fontSize: '1.4rem', 
+                color: isEmergencyActive ? '#DC2626' : '#4B5563', 
+                transition: 'color 0.2s',
+                animation: isEmergencyActive ? 'shake 0.5s infinite' : 'none' 
+              }}>
                 🔔
-                <span style={{ position: 'absolute', top: '-2px', right: '-2px', backgroundColor: '#EF4444', width: '10px', height: '10px', borderRadius: '50%', border: '2px solid white' }}></span>
+                <span style={{ 
+                  position: 'absolute', top: '-2px', right: '-2px', 
+                  backgroundColor: '#EF4444', width: '10px', height: '10px', 
+                  borderRadius: '50%', border: '2px solid white',
+                  display: isEmergencyActive ? 'block' : 'none' 
+                }}></span>
               </Link>
 
               {/* Profile Avatar Dropdown */}
@@ -229,6 +251,8 @@ const Navbar = () => {
           from { opacity: 0; transform: translateY(-10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes shake { 0%, 100% {transform: rotate(0deg)} 25% {transform: rotate(15deg)} 75% {transform: rotate(-15deg)} }
       `}</style>
     </nav>
   );
