@@ -14,12 +14,18 @@ export const AuthProvider = ({ children }) => {
     if (token && storedUser) {
       setUser(storedUser);
     }
-    
     setLoading(false);
   }, []);
 
   const login = async (identifier, password) => {
+    // 🟢 FIXED: Yahan token save nahi karna hai! Sirf backend ko OTP bhejne bolna hai.
     const data = await authAPI.login(identifier, password);
+    return data; 
+  };
+
+  // 🟢 NEW: Asli Token yahan save hoga jab OTP verify ho jayega!
+  const verifyOtp = async (email, otp) => {
+    const data = await authAPI.verifyOtp(email, otp);
     
     localStorage.setItem('token', data.access_token);
     localStorage.setItem('user', JSON.stringify(data.user));
@@ -39,7 +45,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    // 🟢 Don't forget to export verifyOtp here
+    <AuthContext.Provider value={{ user, login, verifyOtp, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axiosInstance from '../api/axios';
+// 🟢 axiosInstance yahan se hata diya kyunki ab saari calls useAuth (AuthContext) sambhalega
 
 const Login = () => {
   const [step, setStep] = useState(1);
@@ -14,7 +14,9 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  
+  // 🟢 FIXED: Yahan verifyOtp ko bhi AuthContext se import kar liya
+  const { login, verifyOtp } = useAuth(); 
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -48,13 +50,11 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post('/auth/login/', {
-        identifier: formData.identifier,
-        password: formData.password
-      });
+      // 🟢 FIXED: AuthContext wala login() call kiya hai. (Isme token save nahi hota, sirf OTP jata hai)
+      const data = await login(formData.identifier, formData.password);
 
-      if (response.data.require_otp) {
-        setEmail(response.data.email);
+      if (data.require_otp) {
+        setEmail(data.email);
         setStep(2);
       }
     } catch (err) {
@@ -70,14 +70,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post('/auth/verify-otp/', {
-        email: email,
-        otp: formData.otp
-      });
+      // 🟢 FIXED: AuthContext wala verifyOtp() call kiya. (Ye token save karega aur user set karega)
+      await verifyOtp(email, formData.otp);
 
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
+      // Agar sab sahi raha toh Dashboard pe bhej do
       window.location.href = '/dashboard';
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid OTP');
@@ -91,10 +87,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      await axiosInstance.post('/auth/login/', {
-        identifier: formData.identifier || email,
-        password: formData.password 
-      });
+      await login(formData.identifier || email, formData.password);
       alert('✅ A new OTP has been sent to your registered email.');
       setFormData({ ...formData, otp: '' });
     } catch (err) {
@@ -209,8 +202,6 @@ const Login = () => {
         <p style={{ color: '#6B7280', marginBottom: '1.5rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
           A 6-digit code has been generated for<br/><strong>{email}</strong>
         </p>
-        
-        {/* 🟢 FIXED: Dev Mode Message Hata Diya Hai */}
 
         <form onSubmit={handleOTPSubmit}>
           <div style={{ marginBottom: '1rem' }}>
