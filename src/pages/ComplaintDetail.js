@@ -152,6 +152,13 @@ const ComplaintDetail = () => {
     const hasBefore = !!complaint.image_url;
     const hasAfter = !!complaint.resolution_photo;
 
+    // Helper function to build full URL
+    const getFullImageUrl = (path) => {
+      if (!path) return null;
+      if (path.startsWith('http')) return path; // Agar Cloudinary link hai toh waisa hi rehne do
+      return `https://hle-backend.onrender.com${path.startsWith('/') ? '' : '/'}${path}`;
+    };
+
     if (!hasBefore && !hasAfter) {
       return (
         <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#F9FAFB', border: '3px dashed #D1D5DB', textAlign: 'center', fontFamily: 'monospace' }}>
@@ -177,7 +184,12 @@ const ComplaintDetail = () => {
             </h4>
             {hasBefore ? (
               <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src={complaint.image_url} alt="Before Issue" style={{ width: '100%', height: '300px', objectFit: 'contain' }} />
+                <img 
+                  src={getFullImageUrl(complaint.image_url)} 
+                  alt="Before Issue" 
+                  style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Image+Not+Found'; }}
+                />
               </div>
             ) : (
               <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>
@@ -194,7 +206,12 @@ const ComplaintDetail = () => {
             {hasAfter ? (
               <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#10B981', color: '#FFF', padding: '0.2rem 0.5rem', fontWeight: 'bold', fontSize: '0.7rem', border: '2px solid #000', fontFamily: 'monospace' }}>VERIFIED</div>
-                <img src={complaint.resolution_photo} alt="After Resolution" style={{ width: '100%', height: '300px', objectFit: 'contain' }} />
+                <img 
+                  src={getFullImageUrl(complaint.resolution_photo)} 
+                  alt="After Resolution" 
+                  style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Result+Image+Missing'; }}
+                />
               </div>
             ) : (
               <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold', textAlign: 'center', padding: '1rem' }}>

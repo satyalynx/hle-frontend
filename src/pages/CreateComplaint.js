@@ -14,6 +14,7 @@ const CreateComplaint = () => {
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -82,14 +83,19 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      // 🟢 YAHAN ADD KIYA: formData aur user.id ko ek naye object me combine kiya
-      const payload = {
-        ...formData,
-        user_id: user?.id
-      };
+      const data = new FormData();
+      data.append('title', formData.title);
+      data.append('description', formData.description);
+      data.append('category', formData.category);
+      data.append('room_number', formData.room_number);
+      data.append('priority', formData.priority);
+      if (selectedFile) {
+        data.append('file', selectedFile); // Photo yahan attach hui
+      }
 
-      // 🟢 formData ki jagah payload bheja
-      await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
+      // Headers mein 'multipart/form-data' automatically chala jayega
+      await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, data);
+      
       alert('Complaint raised successfully!');
       navigate('/complaints');
     } catch (err) {
