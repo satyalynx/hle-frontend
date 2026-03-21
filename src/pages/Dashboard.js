@@ -14,7 +14,37 @@ const Dashboard = () => {
     todayComplaints: 0,
   });
   const [recentComplaints, setRecentComplaints] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // 🚨 EMERGENCY MODAL STATE & POLLING
+  const [activeEmergency, setActiveEmergency] = useState(null);
+
+  useEffect(() => {
+    if (user && (user.role === 'warden' || user.role === 'admin' || user.role === 'caretaker')) {
+        const checkEmergencies = async () => {
+          try {
+             const res = await axiosInstance.get('/emergency/active');
+             // 🟢 FIXED: Grab the first active emergency from the list
+             if (res.data && res.data.length > 0) {
+                 setActiveEmergency(res.data[0]); 
+             }
+          } catch (error) {}
+        };
+        const intervalId = setInterval(checkEmergencies, 3000); 
+        return () => clearInterval(intervalId);
+    }
+  }, [user]);
+
+  // 🟢 FIXED: Match your backend PUT route for updating status
+  const handleAcknowledge = async () => {
+      if (!activeEmergency) return;
+      try { 
+          await axiosInstance.put(`/emergency/${activeEmergency.id}/status`, {
+              status: "handled",
+              notes: "Acknowledged via Command Center"
+          }); 
+      } 
+      catch (e) { console.error("Failed to acknowledge", e); } 
+      finally { setActiveEmergency(null); }
+  };
 
   useEffect(() => {
     fetchStats();
@@ -444,6 +474,19 @@ const Dashboard = () => {
       <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
         <Navbar />
         
+        {/* 🚨 YAHAN CHIPKAANA HAI (Warden ke liye) */}
+        {activeEmergency && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(8px)' }}>
+              <div style={{ backgroundColor: '#FEF2F2', border: '5px solid #DC2626', padding: '3rem', maxWidth: '600px', width: '90%', textAlign: 'center', animation: 'pulse 1.5s infinite' }}>
+                  <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚨</div>
+                  <h1 style={{ color: '#DC2626', fontSize: '2.5rem', fontWeight: '900', margin: '0 0 1rem 0' }}>EMERGENCY ALERT</h1>
+                  <p style={{ fontSize: '1.2rem', color: '#7F1D1D', fontWeight: 'bold', marginBottom: '2rem' }}>"{activeEmergency.message}"</p>
+                  <button onClick={handleAcknowledge} style={{ padding: '1rem 3rem', backgroundColor: '#DC2626', color: 'white', fontSize: '1.2rem', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>ACKNOWLEDGE & RESPOND</button>
+              </div>
+          </div>
+        )}
+        {/* 🚨 MODAL END */}
+        
         <div style={{ 
           backgroundColor: '#FFFFFF',
           padding: '1.5rem 2rem',
@@ -628,6 +671,19 @@ const Dashboard = () => {
   return (
     <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
       <Navbar />
+      
+      {/* 🚨 YAHAN BHI CHIPKAANA HAI (Admin ke liye) */}
+      {activeEmergency && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(8px)' }}>
+              <div style={{ backgroundColor: '#FEF2F2', border: '5px solid #DC2626', padding: '3rem', maxWidth: '600px', width: '90%', textAlign: 'center', animation: 'pulse 1.5s infinite' }}>
+                  <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚨</div>
+                  <h1 style={{ color: '#DC2626', fontSize: '2.5rem', fontWeight: '900', margin: '0 0 1rem 0' }}>EMERGENCY ALERT</h1>
+                  <p style={{ fontSize: '1.2rem', color: '#7F1D1D', fontWeight: 'bold', marginBottom: '2rem' }}>"{activeEmergency.message}"</p>
+                  <button onClick={handleAcknowledge} style={{ padding: '1rem 3rem', backgroundColor: '#DC2626', color: 'white', fontSize: '1.2rem', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}>ACKNOWLEDGE & RESPOND</button>
+              </div>
+          </div>
+      )}
+      {/* 🚨 MODAL END */}
       
       <div style={{ 
         backgroundColor: '#FFFFFF',

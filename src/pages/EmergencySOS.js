@@ -12,11 +12,18 @@ const EmergencySOS = () => {
   const handleSendSOS = async () => {
     setLoading(true);
     try {
-      await axiosInstance.post('/emergency/sos/', { message });
+      // 🟢 FIXED: Matching your backend schema (room_number is required)
+      await axiosInstance.post('/emergency/', { 
+        room_number: "Notified via App", // Dummy/Real room number
+        location: message,               // Tere text area ka message yahan jayega
+        device_info: navigator.userAgent // Optional, par pro lagega
+      });
+      
       alert('🚨 EMERGENCY ALERT SENT! Warden has been notified.');
       navigate('/dashboard');
     } catch (error) {
-      alert('Failed to send SOS. Please call warden directly.');
+      console.error("SOS API ERROR:", error.response?.data || error.message);
+      alert('Failed to send SOS. Check console.');
     } finally {
       setLoading(false);
       setShowConfirm(false);

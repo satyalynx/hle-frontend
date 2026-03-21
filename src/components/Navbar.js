@@ -42,8 +42,14 @@ const Navbar = () => {
     const checkEmergencies = async () => {
       try {
         const res = await axiosInstance.get('/emergency/active');
-        setIsEmergencyActive(res.data?.active || false);
+        // 🟢 FIXED: Backend returns a list []. If length > 0, bell rings!
+        if (res.data && res.data.length > 0) {
+            setIsEmergencyActive(true);
+        } else {
+            setIsEmergencyActive(false);
+        }
       } catch (error) { setIsEmergencyActive(false); }
+    };
     };
     const intervalId = setInterval(checkEmergencies, 3000);
     return () => clearInterval(intervalId);
