@@ -93,7 +93,7 @@ const CreateComplaint = () => {
       
       // 🚨 YE LINE MISSING HAI TERE CODE MEIN:
       if (user?.id) {
-        data.append('user_id', user.id);
+        data.append('user_id', String(user.id)); 
       }
 
       if (selectedFile) {
