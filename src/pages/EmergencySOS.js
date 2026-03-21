@@ -12,8 +12,8 @@ const EmergencySOS = () => {
   const handleSendSOS = async () => {
     setLoading(true);
     try {
-      // 🟢 FIXED: Ab hum URL mein ?user_id= bhej rahe hain!
-      await axiosInstance.post('/emergency/?user_id=1', {
+      // 🟢 THE FINAL FIX: Yahan se ?user_id=1 hata diya hai! Ab ye ekdum normal API call hai.
+      await axiosInstance.post('/emergency/', {
         room_number: "Notified via App", 
         location: message,               
         device_info: navigator.userAgent 
