@@ -39,6 +39,7 @@ import PublicDashboard from './pages/PublicDashboard';
 import MaintenanceHeatmap from './pages/MaintenanceHeatmap';
 import Help from './pages/Help';
 import About from './pages/About';
+import HostelInfo from './pages/HostelInfo';
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -92,6 +93,8 @@ const AppRoutes = () => {
       <Route path="/heatmap" element={<ProtectedRoute><MaintenanceHeatmap /></ProtectedRoute>} />
       <Route path="/help" element={<Help />} />
       <Route path="/about" element={<About />} />
+
+      <Route path="/hostel-info" element={<HostelInfo />} />
       
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Homepage />} />
     </Routes>

@@ -276,22 +276,23 @@ const Dashboard = () => {
                   </div>
                 </Link>
 
-                <Link to="/bills" style={{ textDecoration: 'none' }}>
+                {/* HOSTEL INFO BUTTON */}
+                <Link to="/hostel-info" style={{ textDecoration: 'none' }}>
                   <div style={{ backgroundColor: 'white', padding: '1.25rem', border: '3px solid #000000', cursor: 'pointer', transition: 'all 0.2s' }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#EFF6FF';
-                      e.currentTarget.style.borderColor = '#2563EB';
+                      e.currentTarget.style.backgroundColor = '#FEF2F2';
+                      e.currentTarget.style.borderColor = '#DC2626';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'white';
                       e.currentTarget.style.borderColor = '#000000';
                     }}>
-                    <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>🧾</div>
+                    <div style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>📖</div>
                     <div style={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#000000', fontSize: '0.875rem' }}>
-                      FEE RECEIPTS
+                      HOSTEL INFO
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#666', fontFamily: 'monospace', marginTop: '0.25rem' }}>
-                      Annual fee status & records
+                      Rules, Fees & Fines
                     </div>
                   </div>
                 </Link>
