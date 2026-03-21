@@ -13,7 +13,7 @@ const EmergencySOS = () => {
     setLoading(true);
     try {
       // 🟢 FIXED: Ab hum URL mein ?user_id= bhej rahe hain!
-      await axiosInstance.post(`/emergency/?user_id=${user?.id || 1}`, { 
+      await axiosInstance.post('/emergency/?user_id=1', {
         room_number: "Notified via App", 
         location: message,               
         device_info: navigator.userAgent 
