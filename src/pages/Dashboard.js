@@ -14,7 +14,7 @@ const Dashboard = () => {
     todayComplaints: 0,
   });
   const [recentComplaints, setRecentComplaints] = useState([]);
-  // 🚨 EMERGENCY MODAL STATE & POLLING
+  const [loading, setLoading] = useState(true);
   const [activeEmergency, setActiveEmergency] = useState(null);
 
   useEffect(() => {
