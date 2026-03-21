@@ -12,11 +12,11 @@ const EmergencySOS = () => {
   const handleSendSOS = async () => {
     setLoading(true);
     try {
-      // 🟢 FIXED: Matching your backend schema (room_number is required)
-      await axiosInstance.post('/emergency/', { 
-        room_number: "Notified via App", // Dummy/Real room number
-        location: message,               // Tere text area ka message yahan jayega
-        device_info: navigator.userAgent // Optional, par pro lagega
+      // 🟢 FIXED: Ab hum URL mein ?user_id= bhej rahe hain!
+      await axiosInstance.post(`/emergency/?user_id=${user?.id || 1}`, { 
+        room_number: "Notified via App", 
+        location: message,               
+        device_info: navigator.userAgent 
       });
       
       alert('🚨 EMERGENCY ALERT SENT! Warden has been notified.');
