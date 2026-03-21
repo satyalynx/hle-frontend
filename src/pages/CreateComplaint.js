@@ -34,6 +34,7 @@ const CreateComplaint = () => {
         alert('File size must be less than 5MB');
         return;
       }
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -89,17 +90,27 @@ const CreateComplaint = () => {
       data.append('category', formData.category);
       data.append('room_number', formData.room_number);
       data.append('priority', formData.priority);
-      if (selectedFile) {
-        data.append('file', selectedFile); // Photo yahan attach hui
+      
+      // 🚨 YE LINE MISSING HAI TERE CODE MEIN:
+      if (user?.id) {
+        data.append('user_id', user.id);
       }
 
-      // Headers mein 'multipart/form-data' automatically chala jayega
+      if (selectedFile) {
+        data.append('file', selectedFile); 
+      }
+
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, data);
       
       alert('Complaint raised successfully!');
       navigate('/complaints');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create complaint');
+      const errorMsg = err.response?.data?.detail;
+      if (typeof errorMsg === 'object') {
+        setError("Validation Error: Please check all fields and image format.");
+      } else {
+        setError(errorMsg || 'Failed to create complaint');
+      }
     } finally {
       setLoading(false);
     }
