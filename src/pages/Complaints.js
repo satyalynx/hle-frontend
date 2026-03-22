@@ -204,7 +204,7 @@ const Complaints = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                       <h3 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#111827', margin: 0 }}>{complaint.title}</h3>
                       {/* 🟢 NEW: Visual Evidence Indicator */}
-                      {(complaint.image_url || complaint.resolution_photo) && (
+                      {(complaint.photo_url || complaint.after_photo) && (
                         <span style={{ backgroundColor: '#F3F4F6', border: '1px solid #000', padding: '0.2rem 0.5rem', fontSize: '0.7rem', fontWeight: 'bold', fontFamily: 'monospace' }}>📸 HAS_EVIDENCE</span>
                       )}
                     </div>

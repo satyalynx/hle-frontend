@@ -149,80 +149,81 @@ const ComplaintDetail = () => {
   };
 
   const renderEvidencePanel = () => {
-    const hasBefore = !!complaint.image_url;
-    const hasAfter = !!complaint.resolution_photo;
+  // 🔥 FIX: Use photo_url instead of image_url
+  const hasBefore = !!complaint.photo_url;
+  const hasAfter = !!complaint.after_photo;
 
-    // Helper function to build full URL
-    const getFullImageUrl = (path) => {
-      if (!path) return null;
-      if (path.startsWith('http')) return path; // Agar Cloudinary link hai toh waisa hi rehne do
-      return `https://hle-backend.onrender.com${path.startsWith('/') ? '' : '/'}${path}`;
-    };
+  // Helper function to build full URL
+  const getFullImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return `https://hle-backend.onrender.com${path.startsWith('/') ? '' : '/'}${path}`;
+  };
 
-    if (!hasBefore && !hasAfter) {
-      return (
-        <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#F9FAFB', border: '3px dashed #D1D5DB', textAlign: 'center', fontFamily: 'monospace' }}>
-          <span style={{ fontSize: '1.5rem' }}>📸</span>
-          <p style={{ fontWeight: 'bold', color: '#6B7280', marginTop: '0.5rem' }}>NO VISUAL EVIDENCE ATTACHED</p>
-          <p style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>This ticket was processed without photographic proof.</p>
-        </div>
-      );
-    }
-
+  if (!hasBefore && !hasAfter) {
     return (
-      <div style={{ marginTop: '2.5rem', border: '3px solid #000', backgroundColor: '#FFF', boxShadow: '8px 8px 0 #000' }}>
-        <div style={{ backgroundColor: '#000', color: '#FFF', padding: '1rem', fontWeight: '900', fontFamily: 'monospace', display: 'flex', justifyContent: 'space-between' }}>
-          <span>// EVIDENCE_LOGS</span>
-          <span style={{ color: '#10B981' }}>[AUDIT_TRAIL_ACTIVE]</span>
-        </div>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0' }}>
-          <div style={{ padding: '1.5rem', borderRight: hasAfter ? '3px solid #000' : 'none', display: 'flex', flexDirection: 'column' }}>
-            <h4 style={{ fontWeight: '900', textTransform: 'uppercase', marginBottom: '1rem', color: '#DC2626', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: '#DC2626', borderRadius: '50%' }}></span>
-              Before (Issue Logged)
-            </h4>
-            {hasBefore ? (
-              <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img 
-                  src={getFullImageUrl(complaint.image_url)} 
-                  alt="Before Issue" 
-                  style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Image+Not+Found'; }}
-                />
-              </div>
-            ) : (
-              <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>
-                NO_INITIAL_PHOTO
-              </div>
-            )}
-          </div>
-
-          <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-            <h4 style={{ fontWeight: '900', textTransform: 'uppercase', marginBottom: '1rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: '#10B981', borderRadius: '50%' }}></span>
-              After (Resolution Proof)
-            </h4>
-            {hasAfter ? (
-              <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#10B981', color: '#FFF', padding: '0.2rem 0.5rem', fontWeight: 'bold', fontSize: '0.7rem', border: '2px solid #000', fontFamily: 'monospace' }}>VERIFIED</div>
-                <img 
-                  src={getFullImageUrl(complaint.resolution_photo)} 
-                  alt="After Resolution" 
-                  style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Result+Image+Missing'; }}
-                />
-              </div>
-            ) : (
-              <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold', textAlign: 'center', padding: '1rem' }}>
-                {complaint.status === 'resolved' || complaint.status === 'closed' ? 'RESOLVED_WITHOUT_PHOTO' : 'AWAITING_RESOLUTION'}
-              </div>
-            )}
-          </div>
-        </div>
+      <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#F9FAFB', border: '3px dashed #D1D5DB', textAlign: 'center', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '1.5rem' }}>📸</span>
+        <p style={{ fontWeight: 'bold', color: '#6B7280', marginTop: '0.5rem' }}>NO VISUAL EVIDENCE ATTACHED</p>
+        <p style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>This ticket was processed without photographic proof.</p>
       </div>
     );
-  };
+  }
+
+  return (
+    <div style={{ marginTop: '2.5rem', border: '3px solid #000', backgroundColor: '#FFF', boxShadow: '8px 8px 0 #000' }}>
+      <div style={{ backgroundColor: '#000', color: '#FFF', padding: '1rem', fontWeight: '900', fontFamily: 'monospace', display: 'flex', justifyContent: 'space-between' }}>
+        <span>// EVIDENCE_LOGS</span>
+        <span style={{ color: '#10B981' }}>[AUDIT_TRAIL_ACTIVE]</span>
+      </div>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0' }}>
+        <div style={{ padding: '1.5rem', borderRight: hasAfter ? '3px solid #000' : 'none', display: 'flex', flexDirection: 'column' }}>
+          <h4 style={{ fontWeight: '900', textTransform: 'uppercase', marginBottom: '1rem', color: '#DC2626', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: '#DC2626', borderRadius: '50%' }}></span>
+            Before (Issue Logged)
+          </h4>
+          {hasBefore ? (
+            <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <img 
+                src={getFullImageUrl(complaint.photo_url)} 
+                alt="Before Issue" 
+                style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Image+Not+Found'; }}
+              />
+            </div>
+          ) : (
+            <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>
+              NO_INITIAL_PHOTO
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+          <h4 style={{ fontWeight: '900', textTransform: 'uppercase', marginBottom: '1rem', color: '#10B981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: '#10B981', borderRadius: '50%' }}></span>
+            After (Resolution Proof)
+          </h4>
+          {hasAfter ? (
+            <div style={{ flex: 1, backgroundColor: '#F3F4F6', border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#10B981', color: '#FFF', padding: '0.2rem 0.5rem', fontWeight: 'bold', fontSize: '0.7rem', border: '2px solid #000', fontFamily: 'monospace' }}>VERIFIED</div>
+              <img 
+                src={getFullImageUrl(complaint.after_photo)} 
+                alt="After Resolution" 
+                style={{ width: '100%', height: '300px', objectFit: 'contain' }} 
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Result+Image+Missing'; }}
+              />
+            </div>
+          ) : (
+            <div style={{ flex: 1, backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold', textAlign: 'center', padding: '1rem' }}>
+              {complaint.status === 'resolved' || complaint.status === 'closed' ? 'RESOLVED_WITHOUT_PHOTO' : 'AWAITING_RESOLUTION'}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
   if (loading) return <div><Navbar /><div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'monospace', fontWeight: '900', fontSize: '1.5rem' }}>[LOADING_TICKET_DATA...]</div></div>;
   if (!complaint) return <div><Navbar /><div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'monospace', fontWeight: '900', fontSize: '1.5rem', color: '#DC2626' }}>[ERROR: TICKET_NOT_FOUND]</div></div>;
