@@ -85,12 +85,14 @@ const CreateComplaint = () => {
     try {
       let finalBase64 = null;
 
-      // 🟢 THE ULTIMATE HACK: Read the file EXACTLY when the button is clicked
-      if (selectedFile) {
+      // 🟢 GOD MODE: Bypassing React state entirely and snatching file from HTML directly!
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files.length > 0) {
+        const actualFile = fileInput.files[0];
         finalBase64 = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(selectedFile);
+          reader.readAsDataURL(actualFile);
         });
       }
 
@@ -101,7 +103,7 @@ const CreateComplaint = () => {
         room_number: formData.room_number,
         priority: formData.priority,
         user_id: user?.id ? Number(user.id) : 0,
-        photo_base64: finalBase64 // Send the freshly read photo directly!
+        photo_base64: finalBase64 // Ab ye 1000% jayega
       };
 
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
