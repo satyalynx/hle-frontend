@@ -83,15 +83,25 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      // 🟢 THE BASE64 HACK: Sending JSON instead of FormData
+      let finalBase64 = null;
+
+      // 🟢 THE ULTIMATE HACK: Read the file EXACTLY when the button is clicked
+      if (selectedFile) {
+        finalBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(selectedFile);
+        });
+      }
+
       const payload = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
         room_number: formData.room_number,
         priority: formData.priority,
-        user_id: user?.id ? Number(user.id) : 0, // Ensure integer
-        photo_base64: imagePreview // Base64 string from FileReader goes here
+        user_id: user?.id ? Number(user.id) : 0,
+        photo_base64: finalBase64 // Send the freshly read photo directly!
       };
 
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
@@ -99,12 +109,8 @@ const CreateComplaint = () => {
       alert('Complaint raised successfully!');
       navigate('/complaints');
     } catch (err) {
-      const errorMsg = err.response?.data?.detail;
-      if (typeof errorMsg === 'object') {
-        setError("Validation Error: Please check all fields.");
-      } else {
-        setError(errorMsg || 'Failed to create complaint');
-      }
+      console.error(err);
+      setError('Failed to create complaint. Please try again.');
     } finally {
       setLoading(false);
     }
