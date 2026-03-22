@@ -3,12 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
 import { API_ENDPOINTS } from '../api/config';
 import Navbar from '../components/Navbar';
-// 🟢 YAHAN ADD KIYA: AuthContext import kiya taaki logged-in user ki ID mil sake
 import { useAuth } from '../context/AuthContext';
 
 const CreateComplaint = () => {
   const navigate = useNavigate();
-  // 🟢 YAHAN ADD KIYA: user ko nikal liya context se
   const { user } = useAuth(); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,6 +35,7 @@ const CreateComplaint = () => {
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
+        // Ye base64 string set kar raha hai, jisko hum direct backend bhejenge
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -84,30 +83,25 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      const data = new FormData();
-      data.append('title', formData.title);
-      data.append('description', formData.description);
-      data.append('category', formData.category);
-      data.append('room_number', formData.room_number);
-      data.append('priority', formData.priority);
-      
-      // 🚨 YE LINE MISSING HAI TERE CODE MEIN:
-      if (user?.id) {
-        data.append('user_id', String(user.id)); 
-      }
+      // 🟢 THE BASE64 HACK: Sending JSON instead of FormData
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        room_number: formData.room_number,
+        priority: formData.priority,
+        user_id: user?.id ? Number(user.id) : 0, // Ensure integer
+        photo_base64: imagePreview // Base64 string from FileReader goes here
+      };
 
-      if (selectedFile) {
-        data.append('file', selectedFile); 
-      }
-
-      await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, data);
+      await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
       
       alert('Complaint raised successfully!');
       navigate('/complaints');
     } catch (err) {
       const errorMsg = err.response?.data?.detail;
       if (typeof errorMsg === 'object') {
-        setError("Validation Error: Please check all fields and image format.");
+        setError("Validation Error: Please check all fields.");
       } else {
         setError(errorMsg || 'Failed to create complaint');
       }
