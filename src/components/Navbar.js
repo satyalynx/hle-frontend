@@ -99,7 +99,7 @@ const Navbar = () => {
             <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
               <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
               {/* 🟢 FIXED: Live Dashboard link injected directly next to Dashboard */}
-              <Link to="/live-dashboard" style={{...linkStyle, color: '#EF4444', fontWeight: 'bold'}}>Live Board 🔴</Link>
+              <Link to="/public-dashboard" style={{...linkStyle, color: '#EF4444', fontWeight: 'bold'}}>Live Board</Link>
               <Link to="/food" style={linkStyle}>Food Hub</Link>
               <Link to="/complaints" style={linkStyle}>Complaints</Link>
               <Link to="/notices" style={linkStyle}>Notices</Link>
