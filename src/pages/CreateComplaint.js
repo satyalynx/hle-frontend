@@ -28,10 +28,17 @@ const CreateComplaint = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+      // 🟢 MINIMUM 0.5 MB CHECK
+      if (file.size < 0.5 * 1024 * 1024) {
+        alert('File size must be at least 0.5MB (500KB) for clarity');
         return;
       }
+      // 🟢 MAXIMUM 20 MB CHECK
+      if (file.size > 20 * 1024 * 1024) {
+        alert('File size must be less than 20MB');
+        return;
+      }
+      
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -83,19 +90,8 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      let finalBase64 = null;
-
-      // 🟢 GOD MODE: Bypassing React state entirely and snatching file from HTML directly!
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput && fileInput.files.length > 0) {
-        const actualFile = fileInput.files[0];
-        finalBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(actualFile);
-        });
-      }
-
+      // 🟢 FIXED: Removed the buggy 'God Mode' HTML parser. 
+      // Seedha React state se photo bhej rahe hain taaki 100% backend tak pahuche.
       const payload = {
         title: formData.title,
         description: formData.description,
@@ -103,7 +99,7 @@ const CreateComplaint = () => {
         room_number: formData.room_number,
         priority: formData.priority,
         user_id: user?.id ? Number(user.id) : 0,
-        photo_base64: finalBase64 // Ab ye 1000% jayega
+        photo_base64: imagePreview // PREVIEW DATA GOES HERE
       };
 
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
@@ -311,7 +307,7 @@ const CreateComplaint = () => {
               marginTop: '0.25rem',
               fontFamily: 'monospace',
             }}>
-              Upload a photo of the problem (max 5MB)
+              Upload a photo of the problem (min 0.5MB, max 20MB)
             </p>
             {imagePreview && (
               <div style={{ marginTop: '1rem' }}>

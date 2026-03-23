@@ -53,12 +53,19 @@ const UpdateComplaintStatus = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+      // 🟢 MINIMUM 0.5 MB CHECK (Same as CreateComplaint)
+      if (file.size < 0.5 * 1024 * 1024) {
+        alert('File size must be at least 0.5MB (500KB) for clarity');
+        return;
+      }
+      // 🟢 MAXIMUM 20 MB CHECK (Same as CreateComplaint)
+      if (file.size > 20 * 1024 * 1024) {
+        alert('File size must be less than 20MB');
         return;
       }
       const reader = new FileReader();
       reader.onloadend = () => {
+        // PREVIEW AUR BASE64 DATA YAHI HAI
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -81,9 +88,10 @@ const UpdateComplaintStatus = () => {
     setError('');
 
     try {
+      // 🟢 SENDING BASE64 PREVIEW DIRECTLY TO BACKEND
       const submitData = {
         ...formData,
-        resolution_photo: imagePreview || originalComplaint?.resolution_photo || null 
+        resolution_photo: imagePreview || null 
       };
 
       await axiosInstance.put(`${API_ENDPOINTS.COMPLAINTS}${id}/status`, submitData);
@@ -157,8 +165,8 @@ const UpdateComplaintStatus = () => {
               
               <div style={{ marginBottom: '1rem', fontSize: '0.85rem', color: '#4B5563', fontFamily: 'monospace', fontWeight: '600', backgroundColor: '#FFF', padding: '0.5rem', border: '1px solid #D1D5DB' }}>
                 {isPhotoMandatory 
-                  ? "⚠️ System protocol requires an 'After' photo to submit this for resolution." 
-                  : "💡 You may upload an 'After' photo for transparency."}
+                  ? "⚠️ System protocol requires an 'After' photo to submit this for resolution. (Min 0.5MB, Max 20MB)" 
+                  : "💡 You may upload an 'After' photo for transparency. (Min 0.5MB, Max 20MB)"}
               </div>
 
               <input type="file" accept="image/*" onChange={handleImageChange} style={{ width: '100%', padding: '0.8rem', fontFamily: 'monospace', backgroundColor: 'white', border: '2px solid #000000', cursor: 'pointer' }} />
