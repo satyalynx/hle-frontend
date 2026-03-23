@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axiosInstance from '../api/axios'; // 🟢 Ye add kar lena upar
+import axiosInstance from '../api/axios';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -42,7 +42,6 @@ const Navbar = () => {
     const checkEmergencies = async () => {
       try {
         const res = await axiosInstance.get('/emergency/active');
-        // 🟢 FIXED: Backend returns a list []. If length > 0, bell rings!
         if (res.data && res.data.length > 0) {
             setIsEmergencyActive(true);
         } else {
@@ -97,8 +96,10 @@ const Navbar = () => {
           </Link>
           
           {user && (
-            <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
               <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
+              {/* 🟢 FIXED: Live Dashboard link injected directly next to Dashboard */}
+              <Link to="/live-dashboard" style={{...linkStyle, color: '#EF4444', fontWeight: 'bold'}}>Live Board 🔴</Link>
               <Link to="/food" style={linkStyle}>Food Hub</Link>
               <Link to="/complaints" style={linkStyle}>Complaints</Link>
               <Link to="/notices" style={linkStyle}>Notices</Link>

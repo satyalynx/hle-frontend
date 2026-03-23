@@ -137,17 +137,21 @@ const PublicDashboard = () => {
               </div>
             </div>
             
-            {/* Staff on Duty */}
+            {/* Staff on Duty - 🟢 FIXED: REAL-TIME FALLBACK ADDED HERE */}
             <div style={{ backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #334155', padding: '1.5rem' }}>
               <h3 style={{ margin: '0 0 1rem 0', color: '#F8FAFC', fontSize: '1.2rem' }}>👮 ON DUTY NOW</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #334155', paddingBottom: '0.5rem' }}>
                   <span style={{ color: '#94A3B8', fontSize: '0.9rem' }}>Warden</span>
-                  <span style={{ fontWeight: 'bold', color: '#F8FAFC', fontSize: '0.9rem' }}>{data.staff_on_duty?.warden}</span>
+                  <span style={{ fontWeight: 'bold', color: data.staff_on_duty?.warden ? '#F8FAFC' : '#EF4444', fontSize: '0.9rem', fontStyle: data.staff_on_duty?.warden ? 'normal' : 'italic' }}>
+                    {data.staff_on_duty?.warden || 'Not Assigned'}
+                  </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #334155', paddingBottom: '0.5rem' }}>
                   <span style={{ color: '#94A3B8', fontSize: '0.9rem' }}>Caretaker</span>
-                  <span style={{ fontWeight: 'bold', color: '#F8FAFC', fontSize: '0.9rem' }}>{data.staff_on_duty?.caretaker}</span>
+                  <span style={{ fontWeight: 'bold', color: data.staff_on_duty?.caretaker ? '#F8FAFC' : '#EF4444', fontSize: '0.9rem', fontStyle: data.staff_on_duty?.caretaker ? 'normal' : 'italic' }}>
+                    {data.staff_on_duty?.caretaker || 'Not Assigned'}
+                  </span>
                 </div>
               </div>
             </div>
