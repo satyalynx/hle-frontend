@@ -10,39 +10,20 @@ const CreateComplaint = () => {
   const { user } = useAuth(); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [imagePreview, setImagePreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  
+  // 🟢 FIXED: Removed image states, added 'other_info'
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     category: '',
     room_number: '',
     priority: 'normal',
+    other_info: '' 
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-
-      // 🔴 FIXED: 20MB Render ko crash kar raha tha, 5MB is the safe limit
-      if (file.size > 1 * 1024 * 1024) {
-        alert('RENDER SAFETY: File size must be less than 5MB to avoid Network Error');
-        return;
-      }
-      
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Direct Base64 preview aur data set ho raha hai
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleVoiceInput = () => {
@@ -86,34 +67,31 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      // 🟢 DATA CLEANING: Ensuring every field matches Backend Schema exactly
+      // 🟢 SMART TRICK: Merging 'other_info' into description so backend doesn't need new columns
+      const finalDescription = formData.other_info.trim() 
+        ? `${formData.description.trim()}\n\n[Additional Notes]: ${formData.other_info.trim()}`
+        : formData.description.trim();
+
       const payload = {
         title: formData.title.trim(),
-        description: formData.description.trim(),
+        description: finalDescription,
         category: formData.category,
         room_number: formData.room_number.trim(),
         priority: formData.priority || "normal",
         user_id: user?.id ? Number(user.id) : 0,
-        // 🟢 Sending the full Base64 string (Matches ComplaintCreateDirect schema)
-        photo_base64: formData.photo_base64 || imagePreview 
+        photo_base64: null // 🟢 Nullifying photo to bypass Render limits securely
       };
 
-      // Debugging ke liye console log (Presentation se pehle hata dena)
       console.log("🚀 Sending Payload to Backend:", payload);
 
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
       
-      alert('✅ Complaint raised successfully with Photo Evidence!');
+      // 🟢 MODIFIED MESSAGE
+      alert('✅ Complaint logged successfully in the HLE Audit System!');
       navigate('/complaints');
     } catch (err) {
       console.error("❌ Submission Error:", err);
-      
-      // 🔴 Render specific error handling
-      if (err.message === "Network Error") {
-        setError('Network Error: Photo might be too large for Render Free Tier (Max 5MB).');
-      } else {
-        setError(err.response?.data?.detail || 'Failed to create complaint. Please check all fields.');
-      }
+      setError(err.response?.data?.detail || 'Failed to create complaint. Please check all fields.');
     } finally {
       setLoading(false);
     }
@@ -192,7 +170,6 @@ const CreateComplaint = () => {
                   resize: 'vertical',
                 }} 
               />
-              {/* Voice Input Button */}
               <button
                 type="button"
                 onClick={handleVoiceInput}
@@ -284,6 +261,7 @@ const CreateComplaint = () => {
             />
           </div>
 
+          {/* 🟢 FIXED: REPLACED PHOTO UPLOAD WITH ADDITIONAL NOTES EXACTLY IN YOUR STYLE */}
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ 
               display: 'block', 
@@ -291,19 +269,20 @@ const CreateComplaint = () => {
               fontWeight: '500',
               fontFamily: 'monospace',
             }}>
-              Upload Photo (Optional)
+              Additional Notes (Optional)
             </label>
             <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleImageChange} 
+              type="text" 
+              name="other_info" 
+              value={formData.other_info} 
+              onChange={handleChange} 
+              placeholder="Any specific instructions for the caretaker?" 
               style={{ 
                 width: '100%', 
                 padding: '0.75rem', 
                 border: '2px solid #000000', 
                 borderRadius: '0',
                 fontFamily: 'monospace',
-                backgroundColor: 'white',
               }} 
             />
             <p style={{ 
@@ -312,21 +291,8 @@ const CreateComplaint = () => {
               marginTop: '0.25rem',
               fontFamily: 'monospace',
             }}>
-              Upload a photo of the problem (min 0.5MB, max 20MB)
+              Provide any extra details like availability time (e.g., "Available after 5 PM")
             </p>
-            {imagePreview && (
-              <div style={{ marginTop: '1rem' }}>
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
-                  style={{ 
-                    maxWidth: '200px', 
-                    maxHeight: '200px', 
-                    border: '3px solid #000000',
-                  }} 
-                />
-              </div>
-            )}
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
@@ -371,6 +337,7 @@ const CreateComplaint = () => {
             </div>
           )}
 
+          {/* 🟢 YOUR ORIGINAL ANIMATED BUTTONS - UNTOUCHED */}
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button 
               type="submit" 

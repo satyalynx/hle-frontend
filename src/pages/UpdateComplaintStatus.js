@@ -12,7 +12,6 @@ const UpdateComplaintStatus = () => {
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState('');
-  const [imagePreview, setImagePreview] = useState(null);
   const [originalComplaint, setOriginalComplaint] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -50,43 +49,16 @@ const UpdateComplaintStatus = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // 🟢 MAXIMUM 20 MB CHECK (Same as CreateComplaint)
-      if (file.size > 1 * 1024 * 1024) {
-        alert('File size must be less than 20MB');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // PREVIEW AUR BASE64 DATA YAHI HAI
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const hasBeforeImage = !!originalComplaint?.image_url;
-    
-    // 🟢 SMART LOGIC: Proof is MANDATORY when Caretaker requests review or Warden resolves
-    if (formData.status === 'review_pending' || formData.status === 'resolved') {
-      if (hasBeforeImage && !imagePreview && !originalComplaint?.resolution_photo) {
-        setError('❌ A resolution photo is MANDATORY. Please upload proof of completion.');
-        return;
-      }
-    }
-
     setSubmitLoading(true);
     setError('');
 
     try {
-      // 🟢 SENDING BASE64 PREVIEW DIRECTLY TO BACKEND
+      // 🟢 SENDING NULL FOR PHOTO TO BYPASS RENDER LIMITS
       const submitData = {
         ...formData,
-        resolution_photo: imagePreview || null 
+        resolution_photo: null 
       };
 
       await axiosInstance.put(`${API_ENDPOINTS.COMPLAINTS}${id}/status`, submitData);
@@ -100,10 +72,6 @@ const UpdateComplaintStatus = () => {
   };
 
   if (loading) return <div><Navbar /><div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'monospace', fontWeight: '900', fontSize: '1.5rem' }}>[LOADING_INTERFACE...]</div></div>;
-
-  const hasBeforeImage = !!originalComplaint?.image_url;
-  const isResolving = formData.status === 'review_pending' || formData.status === 'resolved';
-  const isPhotoMandatory = isResolving && hasBeforeImage;
 
   return (
     <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -151,29 +119,7 @@ const UpdateComplaintStatus = () => {
             <textarea name="resolution_note" value={formData.resolution_note} onChange={handleChange} rows={5} placeholder="Document your actions, delays, or resolution steps here..." style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: '#F9FAFB', fontSize: '1rem', resize: 'vertical' }} />
           </div>
 
-          {/* SMART UPLOADER UI */}
-          {isResolving && (
-            <div style={{ marginBottom: '2.5rem', padding: '1.5rem', backgroundColor: isPhotoMandatory ? '#FEF2F2' : '#F0FDF4', border: `3px dashed ${isPhotoMandatory ? '#DC2626' : '#10B981'}` }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase', color: isPhotoMandatory ? '#DC2626' : '#059669' }}>
-                Completion Evidence {isPhotoMandatory ? '(*MANDATORY)' : '(OPTIONAL)'}
-              </label>
-              
-              <div style={{ marginBottom: '1rem', fontSize: '0.85rem', color: '#4B5563', fontFamily: 'monospace', fontWeight: '600', backgroundColor: '#FFF', padding: '0.5rem', border: '1px solid #D1D5DB' }}>
-                {isPhotoMandatory 
-                  ? "⚠️ System protocol requires an 'After' photo to submit this for resolution. (Min 0.5MB, Max 20MB)" 
-                  : "💡 You may upload an 'After' photo for transparency. (Min 0.5MB, Max 20MB)"}
-              </div>
-
-              <input type="file" accept="image/*" onChange={handleImageChange} style={{ width: '100%', padding: '0.8rem', fontFamily: 'monospace', backgroundColor: 'white', border: '2px solid #000000', cursor: 'pointer' }} />
-              
-              {imagePreview && (
-                <div style={{ marginTop: '1.5rem', position: 'relative' }}>
-                  <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: '#000', color: '#FFF', padding: '0.2rem 0.5rem', fontWeight: 'bold', fontSize: '0.7rem', fontFamily: 'monospace' }}>PREVIEW</div>
-                  <img src={imagePreview} alt="Completion Preview" style={{ width: '100%', maxHeight: '300px', border: '3px solid #000000', objectFit: 'contain', backgroundColor: '#E5E7EB' }} />
-                </div>
-              )}
-            </div>
-          )}
+          {/* 🟢 UPLOADER UI COMPLETELY REMOVED */}
 
           {error && <div style={{ padding: '1rem', backgroundColor: '#000', color: '#EF4444', border: '3px solid #EF4444', marginBottom: '1.5rem', fontFamily: 'monospace', fontWeight: 'bold' }}>{error}</div>}
 
