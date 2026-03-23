@@ -1,19 +1,24 @@
 import axios from 'axios';
 
-// 🔴 Ensure this is your Render URL
 const baseURL = 'https://hle-backend.onrender.com'; 
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
 });
 
-// Guard 1: Har API call mein Token chipkana
+// Guard 1: Add token to every request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // 🔥 FIX: Don't set Content-Type for FormData - browser does it automatically
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => {
@@ -21,19 +26,18 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Guard 2: 401 aane par kya karna hai
+// Guard 2: Handle 401 errors
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const originalRequest = error.config;
     
-    // 🔥 BULLETPROOF DEEWAR 🔥
-    // Agar API ka naam 'emergency' hai aur wo fail ho jaye, toh CHUP-CHAAP ignore karo! LOGOUT MAT KARO.
+    // Ignore emergency endpoint failures
     if (originalRequest.url && originalRequest.url.includes('/emergency')) {
         return Promise.reject(error);
     }
-
-    // Baaki kisi asli API (jaise profile/complaints) pe 401 aaye, tabhi logout karo
+    
+    // Logout on 401 for other endpoints
     if (error.response && error.response.status === 401) {
       console.error("Token expired or invalid. Logging out...");
       localStorage.removeItem('token');

@@ -1,148 +1,173 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../api/axios';
 import Navbar from '../components/Navbar';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import axiosInstance from '../api/axios';
 
 const MessAnalytics = () => {
-  const [filter, setFilter] = useState('week'); // Default selection: Week
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    avg_ratings: [0, 0, 0, 0, 0, 0, 0],
+    top_food: 'Loading...',
+    worst_food: 'Loading...',
+    critical_reports: []
+  });
   const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState('week');
 
-  // Filter change hote hi naya data fetch hoga
   useEffect(() => {
-    fetchAnalytics();
-  }, [filter]);
+    fetchAnalytics(timeframe);
+  }, [timeframe]);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = async (range) => {
     setLoading(true);
     try {
-      // Backend se smart-summary mang rahe hain range ke sath
-      const response = await axiosInstance.get(`/mess/analytics/smart-summary?range=${filter}`);
-      setData(response.data);
+      // Backend ke smart-summary route se data la rahe hain
+      const response = await axiosInstance.get(`/mess/analytics/smart-summary?range=${range}`);
+      if (response.data) {
+        setData(response.data);
+      }
     } catch (error) {
-      console.error('Failed to fetch analytics:', error);
+      console.error("Analytics fetch error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const chartData = data?.labels.map((label, index) => ({
-    name: label,
-    rating: data.avg_ratings[index]
-  }));
+  // Trading Theme Colors
+  const bgDark = '#0B0E11'; // Binance dark
+  const panelBg = '#181A20';
+  const neonGreen = '#0ECB81';
+  const neonRed = '#F6465D';
+  const textMain = '#EAECEF';
+  const textMuted = '#848E9C';
+  const borderCol = '#2B3139';
 
-  const filterButtons = [
-    { id: 'day', label: 'Day' },
-    { id: 'week', label: 'Week' },
-    { id: 'month', label: 'Month' },
-    { id: 'year', label: 'Year' }
-  ];
-
-  if (!data && loading) return <div><Navbar /><div style={{ padding: '3rem', textAlign: 'center', fontFamily: 'monospace' }}>Syncing Intelligence...</div></div>;
+  // Calculate overall average for the big ticker
+  const overallAvg = data.avg_ratings.length > 0 
+    ? (data.avg_ratings.reduce((a, b) => a + b, 0) / data.avg_ratings.length).toFixed(2)
+    : "0.00";
+  
+  const isPositive = parseFloat(overallAvg) >= 3.0;
 
   return (
-    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', paddingBottom: '3rem' }}>
+    <div style={{ backgroundColor: bgDark, minHeight: '100vh', color: textMain, fontFamily: 'monospace', overflow: 'hidden' }}>
       <Navbar />
-      <div style={{ padding: '2rem', maxWidth: '1100px', margin: '0 auto' }}>
+      
+      {/* MAIN TERMINAL CONTAINER - FIXED HEIGHT, NO SCROLL */}
+      <div style={{ padding: '1rem', height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+        {/* TOP HEADER BAR (TICKER STYLE) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: panelBg, padding: '1rem', border: `1px solid ${borderCol}`, borderRadius: '4px' }}>
           <div>
-            <h1 style={{ fontFamily: 'system-ui', fontWeight: 'bold', margin: 0 }}>📊 Quality Insight</h1>
-            <p style={{ fontFamily: 'monospace', color: '#6B7280', margin: 0 }}>Real-time student feedback analysis</p>
+            <h1 style={{ margin: 0, fontSize: '1.2rem', color: textMuted, letterSpacing: '2px' }}>MESS PERFORMANCE INDEX (MPI)</h1>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '2.5rem', fontWeight: 'bold', color: isPositive ? neonGreen : neonRed }}>
+                {overallAvg}
+              </span>
+              <span style={{ fontSize: '1rem', color: isPositive ? neonGreen : neonRed }}>
+                {isPositive ? '▲ +BULLISH' : '▼ -BEARISH'}
+              </span>
+            </div>
           </div>
-          
-          {/* DIGITAL WELLBEING STYLE SELECTOR */}
-          <div style={{ display: 'flex', backgroundColor: '#E5E7EB', padding: '4px', borderRadius: '12px' }}>
-            {filterButtons.map((btn) => (
-              <button
-                key={btn.id}
-                onClick={() => setFilter(btn.id)}
+
+          {/* TIMEFRAME SELECTOR */}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {['day', 'week', 'month'].map(tf => (
+              <button 
+                key={tf}
+                onClick={() => setTimeframe(tf)}
                 style={{
-                  padding: '8px 20px',
-                  borderRadius: '10px',
-                  border: 'none',
+                  backgroundColor: timeframe === tf ? '#2B3139' : 'transparent',
+                  color: timeframe === tf ? '#FCD535' : textMuted, // Yellow accent for active
+                  border: `1px solid ${timeframe === tf ? '#FCD535' : borderCol}`,
+                  padding: '0.5rem 1rem',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontFamily: 'monospace',
-                  backgroundColor: filter === btn.id ? 'white' : 'transparent',
-                  color: filter === btn.id ? '#000' : '#6B7280',
-                  boxShadow: filter === btn.id ? '0 2px 4px rgba(0,0,0,0.1)' : 'none',
-                  transition: '0.2s all'
+                  textTransform: 'uppercase'
                 }}
               >
-                {btn.label}
+                {tf}
               </button>
             ))}
           </div>
         </div>
 
-        {/* MASTER CHART CARD */}
-        <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '24px', border: '3px solid #000', boxShadow: '8px 8px 0 #000', marginBottom: '2rem' }}>
-          <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <h2 style={{ margin: 0, fontFamily: 'system-ui' }}>Satisfaction Index</h2>
-              <p style={{ color: '#6B7280', fontFamily: 'monospace', fontSize: '0.9rem' }}>Averaging ratings over this {filter}</p>
-            </div>
-            {loading && <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#2563EB' }}>Updating...</span>}
-          </div>
-
-          <div style={{ width: '100%', height: 350 }}>
-            <ResponsiveContainer>
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorRating" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
-                <YAxis domain={[0, 5]} axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} dx={-10} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: '2px solid #000', fontFamily: 'monospace', boxShadow: '4px 4px 0 #000' }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="rating" 
-                  stroke="#2563EB" 
-                  strokeWidth={4} 
-                  fillOpacity={1} 
-                  fill="url(#colorRating)" 
-                  animationDuration={800}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* DATA BREAKDOWN GRID */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        {/* MIDDLE SECTION: 3-COLUMN LAYOUT */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '1rem', flex: 1 }}>
           
-          {/* TOP PERFORMER */}
-          <div style={{ backgroundColor: '#D1FAE5', padding: '1.5rem', borderRadius: '24px', border: '3px solid #000', boxShadow: '4px 4px 0 #000' }}>
-            <span style={{ fontWeight: 'bold', fontFamily: 'monospace', color: '#065F46', fontSize: '0.8rem' }}>⭐ TOP RATED MEAL</span>
-            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', fontFamily: 'system-ui', marginTop: '10px' }}>
-              {data?.top_food}
+          {/* LEFT COLUMN: MARKET MOVERS (Top/Worst) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ backgroundColor: panelBg, border: `1px solid ${borderCol}`, padding: '1rem', flex: 1, borderRadius: '4px' }}>
+              <h3 style={{ margin: '0 0 1rem 0', color: textMuted, fontSize: '0.9rem', borderBottom: `1px solid ${borderCol}`, paddingBottom: '0.5rem' }}>🔥 TOP GAINER (BEST FOOD)</h3>
+              <p style={{ fontSize: '1.5rem', color: neonGreen, margin: 0, fontWeight: 'bold' }}>{data.top_food}</p>
+              <p style={{ color: textMuted, fontSize: '0.8rem', marginTop: '0.5rem' }}>Highest rated by students</p>
+            </div>
+            
+            <div style={{ backgroundColor: panelBg, border: `1px solid ${borderCol}`, padding: '1rem', flex: 1, borderRadius: '4px' }}>
+              <h3 style={{ margin: '0 0 1rem 0', color: textMuted, fontSize: '0.9rem', borderBottom: `1px solid ${borderCol}`, paddingBottom: '0.5rem' }}>🩸 TOP LOSER (WORST FOOD)</h3>
+              <p style={{ fontSize: '1.5rem', color: neonRed, margin: 0, fontWeight: 'bold' }}>{data.worst_food}</p>
+              <p style={{ color: textMuted, fontSize: '0.8rem', marginTop: '0.5rem' }}>Needs immediate action</p>
             </div>
           </div>
 
-          {/* CRITICAL ALERTS */}
-          <div style={{ backgroundColor: '#111827', color: 'white', padding: '1.5rem', borderRadius: '24px', border: '3px solid #000', boxShadow: '4px 4px 0 #2563EB' }}>
-            <span style={{ fontSize: '0.8rem', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>🚩 CRITICAL FEEDBACK</span>
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {data?.critical_reports.length > 0 ? data.critical_reports.map((r, i) => (
-                <div key={i} style={{ borderLeft: '3px solid #F87171', paddingLeft: '10px' }}>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#FCA5A5', fontWeight: 'bold' }}>{r.meal}</p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', fontStyle: 'italic', opacity: 0.8 }}>"{r.comment}"</p>
-                </div>
-              )) : (
-                <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>No major issues reported in this cycle.</p>
+          {/* CENTER COLUMN: THE "CANDLESTICK" CHART (Using CSS Bars) */}
+          <div style={{ backgroundColor: panelBg, border: `1px solid ${borderCol}`, padding: '1rem', borderRadius: '4px', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: textMuted, fontSize: '0.9rem' }}>📊 SENTIMENT VOLUME CHART</h3>
+            
+            {loading ? (
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#FCD535' }}>Syncing node data...</div>
+            ) : (
+              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '1rem 0', borderBottom: `1px solid ${borderCol}` }}>
+                {data.avg_ratings.map((rating, index) => {
+                  const heightPercent = (rating / 5) * 100;
+                  const isGood = rating >= 3;
+                  return (
+                    <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', width: '10%' }}>
+                      <span style={{ fontSize: '0.8rem', color: isGood ? neonGreen : neonRed }}>{rating.toFixed(1)}</span>
+                      {/* THE BAR */}
+                      <div style={{ 
+                        width: '100%', 
+                        height: `${heightPercent}%`, 
+                        minHeight: '10px',
+                        backgroundColor: isGood ? neonGreen : neonRed,
+                        opacity: 0.8,
+                        boxShadow: `0 0 10px ${isGood ? neonGreen : neonRed}` // Glow effect
+                      }}></div>
+                      <span style={{ fontSize: '0.8rem', color: textMuted }}>{data.labels[index]}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: ORDER BOOK (CRITICAL REPORTS) */}
+          <div style={{ backgroundColor: panelBg, border: `1px solid ${borderCol}`, padding: '1rem', borderRadius: '4px', display: 'flex', flexDirection: 'column' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: textMuted, fontSize: '0.9rem', borderBottom: `1px solid ${borderCol}`, paddingBottom: '0.5rem' }}>⚠️ CRITICAL ALERTS (ORDER BOOK)</h3>
+            
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              {data.critical_reports.length === 0 ? (
+                <p style={{ color: textMuted, fontSize: '0.9rem', textAlign: 'center', marginTop: '2rem' }}>No critical issues detected.</p>
+              ) : (
+                data.critical_reports.map((report, idx) => (
+                  <div key={idx} style={{ 
+                    padding: '0.75rem', 
+                    borderBottom: `1px solid ${borderCol}`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.25rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: neonRed, fontSize: '0.8rem', fontWeight: 'bold' }}>SELL / REJECT</span>
+                      <span style={{ color: textMain, fontSize: '0.8rem' }}>{report.meal}</span>
+                    </div>
+                    <span style={{ color: textMuted, fontSize: '0.85rem' }}>"{report.comment}"</span>
+                  </div>
+                ))
               )}
             </div>
           </div>
 
         </div>
-
       </div>
     </div>
   );

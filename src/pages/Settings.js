@@ -1,68 +1,199 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 
 const Settings = () => {
-  const [theme, setTheme] = useState('light');
+  // 🟢 DARK MODE STATE & LOGIC (Consistent with Profile.js)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
   });
 
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.style.backgroundColor = '#111827';
+      document.body.style.color = '#F9FAFB';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.style.backgroundColor = '#F3F4F6';
+      document.body.style.color = '#111827';
+      localStorage.setItem('theme', 'light');
+    }
+    return () => {
+      document.body.style.backgroundColor = '';
+      document.body.style.color = '';
+    };
+  }, [isDarkMode]);
+
+  const handleSave = () => {
+    // Demo effect
+    const btn = document.getElementById('save-btn');
+    const originalText = btn.innerText;
+    btn.innerText = 'Syncing...';
+    btn.style.backgroundColor = '#10B981';
+    
+    setTimeout(() => {
+      btn.innerText = 'Preferences Saved!';
+      setTimeout(() => {
+        btn.innerText = originalText;
+        btn.style.backgroundColor = '#2563EB';
+      }, 2000);
+    }, 800);
+  };
+
+  // Dynamic Colors
+  const cardBg = isDarkMode ? '#1F2937' : '#FFFFFF';
+  const borderColor = isDarkMode ? '#374151' : '#E5E7EB';
+  const textColor = isDarkMode ? '#F9FAFB' : '#111827';
+  const textMuted = isDarkMode ? '#9CA3AF' : '#6B7280';
+  const primaryColor = '#2563EB';
+
+  // Helper for Modern Toggle Switch
+  const ToggleSwitch = ({ checked, onChange }) => (
+    <div 
+      onClick={onChange}
+      style={{
+        width: '44px',
+        height: '24px',
+        backgroundColor: checked ? primaryColor : (isDarkMode ? '#4B5563' : '#D1D5DB'),
+        borderRadius: '999px',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s'
+      }}
+    >
+      <div style={{
+        width: '20px',
+        height: '20px',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '50%',
+        position: 'absolute',
+        top: '2px',
+        left: checked ? '22px' : '2px',
+        transition: 'left 0.3s',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+      }} />
+    </div>
+  );
+
   return (
-    <div>
+    <div style={{ minHeight: '100vh', transition: 'all 0.3s ease' }}>
       <Navbar />
+      
       <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ marginBottom: '2rem' }}>Settings</h1>
-        <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid #E5E7EB' }}>
-            <h2 style={{ marginBottom: '1rem' }}>Appearance</h2>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Theme</label>
-              <select value={theme} onChange={(e) => setTheme(e.target.value)} style={{ padding: '0.5rem', border: '1px solid #E5E7EB', borderRadius: '4px' }}>
-                <option value="light">Light</option>
-                <option value="dark">Dark (Coming Soon)</option>
-              </select>
+        <h1 style={{ marginBottom: '2rem', fontSize: '2rem', color: textColor, fontWeight: '700' }}>
+          System Settings
+        </h1>
+        
+        <div style={{ 
+          backgroundColor: cardBg, 
+          padding: '2rem', 
+          borderRadius: '12px', 
+          border: `1px solid ${borderColor}`,
+          boxShadow: isDarkMode ? '0 4px 6px rgba(0,0,0,0.3)' : '0 4px 6px rgba(0,0,0,0.05)',
+          transition: 'all 0.3s ease'
+        }}>
+          
+          {/* 🟢 APPEARANCE SECTION */}
+          <div style={{ marginBottom: '2.5rem', paddingBottom: '2rem', borderBottom: `1px solid ${borderColor}` }}>
+            <h2 style={{ fontSize: '1.25rem', color: textColor, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🎨 Appearance
+            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: '0 0 0.25rem 0', fontWeight: '500', color: textColor, fontSize: '1.1rem' }}>Display Theme</p>
+                <p style={{ margin: 0, fontSize: '0.875rem', color: textMuted }}>Switch between Day and Night viewing modes.</p>
+              </div>
+              <ToggleSwitch 
+                checked={isDarkMode} 
+                onChange={() => setIsDarkMode(!isDarkMode)} 
+              />
             </div>
           </div>
-          <div>
-            <h2 style={{ marginBottom: '1rem' }}>Notifications</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input type="checkbox" checked={notifications.email} onChange={(e) => {
-                  setNotifications({ ...notifications, email: e.target.checked });
-                  if (e.target.checked) {
-                    alert('✅ Email notifications enabled! You will receive updates on your registered email.');
-                  } else {
-                    alert('❌ Email notifications disabled.');
-                  }
-                }} />
-                <span>Email Notifications</span>
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input type="checkbox" checked={notifications.push} onChange={(e) => {
-                  setNotifications({ ...notifications, push: e.target.checked });
-                  alert('Push notifications coming soon!');
-                }} />
-                <span>Push Notifications (Coming Soon)</span>
-              </label>
+
+          {/* 🟢 NOTIFICATIONS SECTION */}
+          <div style={{ marginBottom: '2.5rem', paddingBottom: '2rem', borderBottom: `1px solid ${borderColor}` }}>
+            <h2 style={{ fontSize: '1.25rem', color: textColor, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              🔔 Notifications
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {/* Email Toggle */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ margin: '0 0 0.25rem 0', fontWeight: '500', color: textColor }}>Email Alerts</p>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: textMuted }}>Receive updates on assignments and billing.</p>
+                </div>
+                <ToggleSwitch 
+                  checked={notifications.email} 
+                  onChange={() => {
+                    setNotifications({ ...notifications, email: !notifications.email });
+                  }} 
+                />
+              </div>
+
+              {/* Push Toggle */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ margin: '0 0 0.25rem 0', fontWeight: '500', color: textColor }}>Browser Push Notifications</p>
+                  <p style={{ margin: 0, fontSize: '0.875rem', color: textMuted }}>Get real-time alerts on your device.</p>
+                </div>
+                <ToggleSwitch 
+                  checked={notifications.push} 
+                  onChange={() => {
+                    const newState = !notifications.push;
+                    setNotifications({ ...notifications, push: newState });
+                    if (newState) alert('Browser permission requested for Push Notifications.');
+                  }} 
+                />
+              </div>
             </div>
-            <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#EFF6FF', borderRadius: '4px' }}>
-              <p style={{ fontSize: '0.875rem', color: '#1E40AF', marginBottom: '0.5rem' }}>
-                <strong>📧 You will receive emails for:</strong>
+
+            {/* Notification Info Box */}
+            <div style={{ 
+              marginTop: '1.5rem', 
+              padding: '1.25rem', 
+              backgroundColor: isDarkMode ? 'rgba(37, 99, 235, 0.1)' : '#EFF6FF', 
+              borderRadius: '8px',
+              border: `1px solid ${isDarkMode ? 'rgba(37, 99, 235, 0.2)' : '#BFDBFE'}`
+            }}>
+              <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#60A5FA' : '#1E40AF', marginBottom: '0.75rem', marginTop: 0 }}>
+                <strong>📧 Active Alert Triggers:</strong>
               </p>
-              <ul style={{ fontSize: '0.875rem', color: '#374151', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                <li>New complaint assignments</li>
-                <li>Status updates on your complaints</li>
-                <li>Bill reminders and due dates</li>
-                <li>Important notices and announcements</li>
+              <ul style={{ fontSize: '0.875rem', color: isDarkMode ? '#9CA3AF' : '#374151', lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem' }}>
+                <li>New complaint assignments to caretakers</li>
+                <li>Status resolutions on your active tickets</li>
+                <li>Monthly bill generation and due dates</li>
+                <li>Critical warden announcements</li>
               </ul>
             </div>
           </div>
-          <div style={{ marginTop: '2rem' }}>
-            <button onClick={() => alert('Settings saved!')} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#2563EB', color: 'white', border: 'none', borderRadius: '4px', fontWeight: '500' }}>
-              Save Settings
+
+          {/* 🟢 SAVE ACTION */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button 
+              id="save-btn"
+              onClick={handleSave} 
+              style={{ 
+                padding: '0.75rem 2rem', 
+                backgroundColor: primaryColor, 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '6px', 
+                fontWeight: '600',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)'
+              }}
+            >
+              Save Preferences
             </button>
           </div>
+
         </div>
       </div>
     </div>
