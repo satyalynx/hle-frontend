@@ -53,13 +53,8 @@ const UpdateComplaintStatus = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 🟢 MINIMUM 0.5 MB CHECK (Same as CreateComplaint)
-      if (file.size < 0.5 * 1024 * 1024) {
-        alert('File size must be at least 0.5MB (500KB) for clarity');
-        return;
-      }
       // 🟢 MAXIMUM 20 MB CHECK (Same as CreateComplaint)
-      if (file.size > 20 * 1024 * 1024) {
+      if (file.size > 1 * 1024 * 1024) {
         alert('File size must be less than 20MB');
         return;
       }

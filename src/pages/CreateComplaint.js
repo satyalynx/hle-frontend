@@ -28,14 +28,9 @@ const CreateComplaint = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 🟢 MINIMUM 0.5 MB CHECK (Clarity ke liye sahi hai)
-      if (file.size < 0.5 * 1024 * 1024) {
-        alert('File size must be at least 0.5MB (500KB) for clarity');
-        return;
-      }
 
       // 🔴 FIXED: 20MB Render ko crash kar raha tha, 5MB is the safe limit
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 1 * 1024 * 1024) {
         alert('RENDER SAFETY: File size must be less than 5MB to avoid Network Error');
         return;
       }
