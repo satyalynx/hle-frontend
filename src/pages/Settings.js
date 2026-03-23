@@ -1,15 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useTheme } from '../context/ThemeContext'; // 🟢 THEME CONTEXT IMPORTED
 
 const Settings = () => {
-  // 🟢 USING GLOBAL THEME INSTEAD OF LOCAL STATE
-  const { isDarkMode, toggleTheme } = useTheme();
+  // 🟢 GLOBAL DARK MODE CONNECTED
+  const themeContext = useTheme();
+  
+  // Use Global state, but fallback to local if something is wrong (Bulletproof)
+  const isDarkMode = themeContext?.isDarkMode || false;
+  
+  // Custom function to toggle globally and update local storage just in case
+  const toggleDarkMode = () => {
+    if (themeContext?.toggleTheme) {
+      themeContext.toggleTheme();
+    }
+  };
 
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
   });
+
+  // Keep original useEffect just to be safe, but sync it with global state
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.style.backgroundColor = '#111827';
+      document.body.style.color = '#F9FAFB';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.style.backgroundColor = '#F3F4F6';
+      document.body.style.color = '#111827';
+      localStorage.setItem('theme', 'light');
+    }
+    return () => {
+      document.body.style.backgroundColor = '';
+      document.body.style.color = '';
+    };
+  }, [isDarkMode]);
 
   const handleSave = () => {
     // Demo effect
@@ -92,7 +119,7 @@ const Settings = () => {
               </div>
               <ToggleSwitch 
                 checked={isDarkMode} 
-                onChange={toggleTheme} // 🟢 GLOBAL TOGGLE FUNCTION TRIGGERED HERE
+                onChange={toggleDarkMode} // 🟢 CHANGED TO TRIGGER GLOBAL THEME
               />
             </div>
           </div>
