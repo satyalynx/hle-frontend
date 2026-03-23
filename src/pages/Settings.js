@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import { useTheme } from '../context/ThemeContext'; // 🟢 Global context
 
 const Settings = () => {
-  const themeContext = useTheme();
-
-  // 🟢 LOCAL STATE IS BACK: Button ab hamesha move karega!
-  const [localDark, setLocalDark] = useState(() => {
+  // 🟢 DARK MODE STATE & LOGIC (Consistent with Profile.js)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
 
@@ -15,20 +12,8 @@ const Settings = () => {
     push: false,
   });
 
-  // 🟢 BULLETPROOF TOGGLE FUNCTION
-  const handleThemeToggle = () => {
-    const newTheme = !localDark;
-    
-    // 1. Button ko turant move karao (Visual Feedback)
-    setLocalDark(newTheme);
-
-    // 2. Global Context ko update karo (Agar exist karta hai)
-    if (themeContext && themeContext.toggleTheme) {
-      themeContext.toggleTheme();
-    }
-
-    // 3. Brute-force DOM change (Agar context fail bhi hua toh page dark hoga hi)
-    if (newTheme) {
+  useEffect(() => {
+    if (isDarkMode) {
       document.body.style.backgroundColor = '#111827';
       document.body.style.color = '#F9FAFB';
       localStorage.setItem('theme', 'dark');
@@ -37,9 +22,14 @@ const Settings = () => {
       document.body.style.color = '#111827';
       localStorage.setItem('theme', 'light');
     }
-  };
+    return () => {
+      document.body.style.backgroundColor = '';
+      document.body.style.color = '';
+    };
+  }, [isDarkMode]);
 
   const handleSave = () => {
+    // Demo effect
     const btn = document.getElementById('save-btn');
     const originalText = btn.innerText;
     btn.innerText = 'Syncing...';
@@ -54,21 +44,21 @@ const Settings = () => {
     }, 800);
   };
 
-  // Dynamic Colors based on LOCAL state so UI always updates
-  const cardBg = localDark ? '#1F2937' : '#FFFFFF';
-  const borderColor = localDark ? '#374151' : '#E5E7EB';
-  const textColor = localDark ? '#F9FAFB' : '#111827';
-  const textMuted = localDark ? '#9CA3AF' : '#6B7280';
+  // Dynamic Colors
+  const cardBg = isDarkMode ? '#1F2937' : '#FFFFFF';
+  const borderColor = isDarkMode ? '#374151' : '#E5E7EB';
+  const textColor = isDarkMode ? '#F9FAFB' : '#111827';
+  const textMuted = isDarkMode ? '#9CA3AF' : '#6B7280';
   const primaryColor = '#2563EB';
 
-  // Toggle Switch Component
+  // Helper for Modern Toggle Switch
   const ToggleSwitch = ({ checked, onChange }) => (
     <div 
       onClick={onChange}
       style={{
         width: '44px',
         height: '24px',
-        backgroundColor: checked ? primaryColor : (localDark ? '#4B5563' : '#D1D5DB'),
+        backgroundColor: checked ? primaryColor : (isDarkMode ? '#4B5563' : '#D1D5DB'),
         borderRadius: '999px',
         position: 'relative',
         cursor: 'pointer',
@@ -103,7 +93,7 @@ const Settings = () => {
           padding: '2rem', 
           borderRadius: '12px', 
           border: `1px solid ${borderColor}`,
-          boxShadow: localDark ? '0 4px 6px rgba(0,0,0,0.3)' : '0 4px 6px rgba(0,0,0,0.05)',
+          boxShadow: isDarkMode ? '0 4px 6px rgba(0,0,0,0.3)' : '0 4px 6px rgba(0,0,0,0.05)',
           transition: 'all 0.3s ease'
         }}>
           
@@ -118,8 +108,8 @@ const Settings = () => {
                 <p style={{ margin: 0, fontSize: '0.875rem', color: textMuted }}>Switch between Day and Night viewing modes.</p>
               </div>
               <ToggleSwitch 
-                checked={localDark} 
-                onChange={handleThemeToggle} // 🟢 Calls the brute-force function
+                checked={isDarkMode} 
+                onChange={() => setIsDarkMode(!isDarkMode)} 
               />
             </div>
           </div>
@@ -131,6 +121,7 @@ const Settings = () => {
             </h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {/* Email Toggle */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <p style={{ margin: '0 0 0.25rem 0', fontWeight: '500', color: textColor }}>Email Alerts</p>
@@ -138,10 +129,13 @@ const Settings = () => {
                 </div>
                 <ToggleSwitch 
                   checked={notifications.email} 
-                  onChange={() => setNotifications({ ...notifications, email: !notifications.email })} 
+                  onChange={() => {
+                    setNotifications({ ...notifications, email: !notifications.email });
+                  }} 
                 />
               </div>
 
+              {/* Push Toggle */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <p style={{ margin: '0 0 0.25rem 0', fontWeight: '500', color: textColor }}>Browser Push Notifications</p>
@@ -158,17 +152,18 @@ const Settings = () => {
               </div>
             </div>
 
+            {/* Notification Info Box */}
             <div style={{ 
               marginTop: '1.5rem', 
               padding: '1.25rem', 
-              backgroundColor: localDark ? 'rgba(37, 99, 235, 0.1)' : '#EFF6FF', 
+              backgroundColor: isDarkMode ? 'rgba(37, 99, 235, 0.1)' : '#EFF6FF', 
               borderRadius: '8px',
-              border: `1px solid ${localDark ? 'rgba(37, 99, 235, 0.2)' : '#BFDBFE'}`
+              border: `1px solid ${isDarkMode ? 'rgba(37, 99, 235, 0.2)' : '#BFDBFE'}`
             }}>
-              <p style={{ fontSize: '0.875rem', color: localDark ? '#60A5FA' : '#1E40AF', marginBottom: '0.75rem', marginTop: 0 }}>
+              <p style={{ fontSize: '0.875rem', color: isDarkMode ? '#60A5FA' : '#1E40AF', marginBottom: '0.75rem', marginTop: 0 }}>
                 <strong>📧 Active Alert Triggers:</strong>
               </p>
-              <ul style={{ fontSize: '0.875rem', color: localDark ? '#9CA3AF' : '#374151', lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem' }}>
+              <ul style={{ fontSize: '0.875rem', color: isDarkMode ? '#9CA3AF' : '#374151', lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem' }}>
                 <li>New complaint assignments to caretakers</li>
                 <li>Status resolutions on your active tickets</li>
                 <li>Monthly bill generation and due dates</li>
