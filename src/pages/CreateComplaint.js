@@ -28,21 +28,22 @@ const CreateComplaint = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 🟢 MINIMUM 0.5 MB CHECK
+      // 🟢 MINIMUM 0.5 MB CHECK (Clarity ke liye sahi hai)
       if (file.size < 0.5 * 1024 * 1024) {
         alert('File size must be at least 0.5MB (500KB) for clarity');
         return;
       }
-      // 🟢 MAXIMUM 20 MB CHECK
-      if (file.size > 20 * 1024 * 1024) {
-        alert('File size must be less than 20MB');
+
+      // 🔴 FIXED: 20MB Render ko crash kar raha tha, 5MB is the safe limit
+      if (file.size > 5 * 1024 * 1024) {
+        alert('RENDER SAFETY: File size must be less than 5MB to avoid Network Error');
         return;
       }
       
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Ye base64 string set kar raha hai, jisko hum direct backend bhejenge
+        // Direct Base64 preview aur data set ho raha hai
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -90,25 +91,34 @@ const CreateComplaint = () => {
     setError('');
 
     try {
-      // 🟢 FIXED: Removed the buggy 'God Mode' HTML parser. 
-      // Seedha React state se photo bhej rahe hain taaki 100% backend tak pahuche.
+      // 🟢 DATA CLEANING: Ensuring every field matches Backend Schema exactly
       const payload = {
-        title: formData.title,
-        description: formData.description,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         category: formData.category,
-        room_number: formData.room_number,
-        priority: formData.priority,
+        room_number: formData.room_number.trim(),
+        priority: formData.priority || "normal",
         user_id: user?.id ? Number(user.id) : 0,
-        photo_base64: imagePreview // PREVIEW DATA GOES HERE
+        // 🟢 Sending the full Base64 string (Matches ComplaintCreateDirect schema)
+        photo_base64: formData.photo_base64 || imagePreview 
       };
+
+      // Debugging ke liye console log (Presentation se pehle hata dena)
+      console.log("🚀 Sending Payload to Backend:", payload);
 
       await axiosInstance.post(API_ENDPOINTS.COMPLAINTS, payload);
       
-      alert('Complaint raised successfully!');
+      alert('✅ Complaint raised successfully with Photo Evidence!');
       navigate('/complaints');
     } catch (err) {
-      console.error(err);
-      setError('Failed to create complaint. Please try again.');
+      console.error("❌ Submission Error:", err);
+      
+      // 🔴 Render specific error handling
+      if (err.message === "Network Error") {
+        setError('Network Error: Photo might be too large for Render Free Tier (Max 5MB).');
+      } else {
+        setError(err.response?.data?.detail || 'Failed to create complaint. Please check all fields.');
+      }
     } finally {
       setLoading(false);
     }
