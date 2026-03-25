@@ -7,348 +7,440 @@ import Footer from '../components/Footer';
 const Homepage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearch = (e) => {
+  // 🟢 SMOOTH SCROLL LOGIC (Replaces Search)
+  const handleJump = (e, id) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${searchTerm}`);
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
-  // 🟢 FIXED: 6 Balanced Modules
-  const quickLinks = [
-    { title: 'Smart Complaints', icon: '📋', link: '/complaints', desc: 'Raise, track, and resolve maintenance issues.' },
-    { title: 'Food Hub', icon: '🍕', link: '/food', desc: 'Check the daily menu, rate meals, and view analytics.' },
-    { title: 'Broadcast Notices', icon: '📢', link: '/notices', desc: 'Get instant official announcements and updates.' },
-    { title: 'Digital Bills', icon: '💳', link: '/bills', desc: 'Track monthly dues, view history, and manage payments.' },
-    { title: 'Live Public Dashboard', icon: '🌐', link: '/public-dashboard', desc: 'Open metrics and transparency for everyone.' },
-    { title: 'Issue Heatmap', icon: '🗺️', link: '/heatmap', desc: 'Visualise maintenance hotspots across blocks.' },
+  // ==========================================
+  // MASSIVE DATA STRUCTURES (ADDS HEAVY LOC & DETAIL)
+  // ==========================================
+
+  const platformModules = [
+    { 
+      id: 'MOD-01', title: 'Command Center', subtitle: 'LIVE TELEMETRY MAP', icon: '🗺️', link: '/heatmap', 
+      desc: 'Real-time heatmap tracking infrastructure faults, active caretaker assignments, and chronic issues across all 7 institutional hostels.', 
+      secured: true, color: '#38BDF8' 
+    },
+    { 
+      id: 'MOD-02', title: 'Master Ledger', subtitle: 'SECURE FINANCE DB', icon: '💳', link: '/bills', 
+      desc: 'Centralized financial clearinghouse for vendor payouts and fee records. Features strict authorization limits for Admin personnel.', 
+      secured: true, color: '#10B981' 
+    },
+    { 
+      id: 'MOD-03', title: 'Expose Meter', subtitle: 'PUBLIC AUDIT SYSTEM', icon: '📊', link: '/food', 
+      desc: 'Immutable, democratic rating system for the mess facility. Aggregates student feedback into a global, unalterable performance metric.', 
+      secured: true, color: '#F59E0B' 
+    },
+    { 
+      id: 'MOD-04', title: 'System Broadcasts', subtitle: 'OFFICIAL DIRECTIVES', icon: '📢', link: '/notices', 
+      desc: 'High-priority digital alerts replacing legacy notice boards. Instantly pushes administrative protocols to all registered terminals.', 
+      secured: true, color: '#A78BFA' 
+    },
+    { 
+      id: 'MOD-05', title: 'Smart Tickets', subtitle: 'MAINTENANCE QUEUE', icon: '📋', link: '/complaints', 
+      desc: 'Photo-verified maintenance tracking with automated formatting. Replaces paper registers with accountable digital workflows.', 
+      secured: true, color: '#F472B6' 
+    },
+    { 
+      id: 'MOD-06', title: 'Live Dashboard', subtitle: 'OPEN TRANSPARENCY', icon: '🌐', link: '/public-dashboard', 
+      desc: 'Unrestricted open metrics and system status visible to all public stakeholders. Ensures complete institutional transparency.', 
+      secured: false, color: '#FCD34D' 
+    },
+  ];
+
+  const workflowSteps = [
+    {
+      step: '01', role: 'Student Resident', color: '#2563EB',
+      action: 'Initiates Pipeline',
+      details: [
+        'Logs infrastructure faults with mandatory photo evidence.',
+        'Submits daily mess audits via the Expose Meter.',
+        'Tracks personal financial dues and fee receipts.'
+      ]
+    },
+    {
+      step: '02', role: 'Caretaker (Ops)', color: '#F59E0B',
+      action: 'Executes Task',
+      details: [
+        'Receives real-time assigned tickets in operational queue.',
+        'Performs physical maintenance on campus.',
+        'Uploads "After" photos as proof of resolution for payouts.'
+      ]
+    },
+    {
+      step: '03', role: 'Hostel Warden', color: '#10B981',
+      action: 'Provides Oversight',
+      details: [
+        'Audits caretaker submissions and verifies physical resolution.',
+        'Broadcasts official system directives and emergency notices.',
+        'Monitors the global Command Center for chronic faults.'
+      ]
+    },
+    {
+      step: '04', role: 'System Admin', color: '#DC2626',
+      action: 'Root Access',
+      details: [
+        'Authorizes final financial settlements in the Master Ledger.',
+        'Maintains absolute control over institutional user data.',
+        'Oversees complete campus telemetry across all 7 hostels.'
+      ]
+    }
+  ];
+
+  const legacyFailures = [
+    'Manual paper-based complaint registers prone to data loss.',
+    'Zero visibility on maintenance staff operational queues.',
+    'No photographic verification for completed infrastructure work.',
+    'Mess feedback easily manipulated or ignored by administration.',
+    'Disorganized, untrackable fine collections and pending dues.',
+    'Delayed communication via physical notice boards.'
+  ];
+
+  const hleSolutions = [
+    '100% Digital Telemetry & Automated Ticket Generation.',
+    'Live Heatmap monitoring staff task queues in real-time.',
+    'Mandatory Before/After photo evidence policies enforced.',
+    'Immutable, public mess rating database for total transparency.',
+    'Centralized Finance Ledger with strict Role-Based Access Control.',
+    'Instant Digital Broadcasts to all registered user terminals.'
+  ];
+
+  const securityFeatures = [
+    { title: 'JWT Cryptography', desc: 'Stateless, secure session management using JSON Web Tokens (HS256).' },
+    { title: 'SMTP OTP Auth', desc: 'Multi-factor email verification via Brevo Engine for identity proofing.' },
+    { title: 'Strict RBAC', desc: 'Hardcoded architectural segregation preventing cross-role data leaks.' },
+    { title: 'Base64 Processing', desc: 'Direct image-to-string encoding for seamless media database storage.' }
   ];
 
   return (
-    <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Navbar />
       
-      {/* 1. HERO SECTION */}
-      <div style={{ 
-        maxWidth: '1400px', 
-        margin: '0 auto', 
-        padding: '100px 2rem 80px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-        gap: '60px',
-        alignItems: 'center',
-      }}>
+      {/* =========================================================
+          1. HERO SECTION (NIIS BRANDING & JUMP TO)
+          ========================================================= */}
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '6rem 2rem', borderBottom: '4px solid #000' }}>
         
-        {/* Left Side */}
-        <div>
-          <div style={{ 
-            display: 'inline-block', 
-            backgroundColor: '#FBBF24', 
-            padding: '0.2rem 1rem', 
-            border: '2px solid #000', 
-            fontWeight: 'bold', 
-            fontFamily: 'monospace',
-            marginBottom: '1rem',
-            transform: 'rotate(-2deg)'
-          }}>
-            #1 HOSTEL SYSTEM
-          </div>
-          <h1 style={{ 
-            fontSize: '5rem', 
-            fontWeight: '900', 
-            marginBottom: '1rem',
-            lineHeight: '1',
-            letterSpacing: '-2px',
-            color: '#000000',
-            textShadow: '4px 4px 0px #E5E7EB'
-          }}>
-            Hello.<br/>I'm HLE.
-          </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4rem' }}>
           
-          <p style={{ 
-            fontSize: '1.25rem', 
-            color: '#374151',
-            marginBottom: '2.5rem',
-            lineHeight: '1.6',
-            maxWidth: '500px',
-            fontWeight: '500'
-          }}>
-            A comprehensive, digital-first hostel management system built to eliminate paperwork, speed up maintenance, and optimize hostel life.
-          </p>
-
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-            <form onSubmit={handleSearch} style={{ flex: 1, position: 'relative' }}>
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search complaints, notices..."
-                style={{
-                  width: '100%',
-                  padding: '1rem 1.5rem',
-                  border: '3px solid #000000',
-                  borderRadius: '0',
-                  fontSize: '1rem',
-                  fontFamily: 'monospace',
-                  outline: 'none',
-                  boxShadow: '4px 4px 0 #000000',
-                  transition: 'transform 0.1s',
-                }}
-              />
-              <button
-                type="submit"
-                style={{
-                  position: 'absolute',
-                  right: '8px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  padding: '0.6rem 1.2rem',
-                  backgroundColor: '#000000',
-                  color: 'white',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'monospace',
-                  fontWeight: 'bold'
-                }}
-              >
-                GO →
-              </button>
-            </form>
+          {/* Left Hero Content */}
+          <div style={{ flex: '1', minWidth: '350px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.8rem', backgroundColor: '#000', color: '#FFF', padding: '0.5rem 1.2rem', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', marginBottom: '2rem', letterSpacing: '1px', boxShadow: '4px 4px 0 #E5E7EB' }}>
+              <span style={{ width: '10px', height: '10px', backgroundColor: '#10B981', borderRadius: '50%', animation: 'pulse 2s infinite' }}></span>
+              NIIS INSTITUTE OF INFORMATION SCIENCE & MANAGEMENT
+            </div>
             
-            <Link to="/emergency-sos">
-              <button style={{
-                padding: '1rem 1.5rem',
-                backgroundColor: '#DC2626',
-                color: 'white',
-                border: '3px solid #000000',
-                boxShadow: '4px 4px 0 #000000',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                whiteSpace: 'nowrap',
-                fontFamily: 'monospace',
-                transition: 'transform 0.1s, boxShadow 0.1s'
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.transform = 'translate(4px, 4px)';
-                e.currentTarget.style.boxShadow = '0 0 0 #000000';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.transform = 'translate(0, 0)';
-                e.currentTarget.style.boxShadow = '4px 4px 0 #000000';
-              }}
-              >
-                🚨 SOS
-              </button>
-            </Link>
-          </div>
-        </div>
+            <h1 style={{ fontSize: '5.5rem', fontWeight: '900', margin: '0 0 1.5rem 0', lineHeight: '1.1', letterSpacing: '-2px', color: '#000', textTransform: 'uppercase' }}>
+              Hostel<br/>Life Easy.
+            </h1>
+            
+            <p style={{ fontSize: '1.25rem', color: '#374151', marginBottom: '3rem', lineHeight: '1.6', maxWidth: '650px', fontWeight: 'bold', fontFamily: 'monospace' }}>
+              A proprietary, digital-first infrastructure management architecture built specifically to eliminate institutional bottlenecks, accelerate maintenance, and enforce strict public transparency.
+            </p>
 
-        {/* Right Side - Logo Tie-up */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          gap: '2rem',
-          padding: '3rem 2rem',
-          border: '4px solid #000000',
-          backgroundColor: '#DBEAFE',
-          boxShadow: '8px 8px 0 #000000',
-          transform: 'rotate(1deg)'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '120px', height: '120px',
-              border: '3px solid #000000',
-              backgroundColor: '#2563EB',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '2.5rem', fontWeight: 'bold', color: 'white',
-              marginBottom: '1rem',
-              boxShadow: '4px 4px 0 #000000'
-            }}>
-              HLE
+            {/* 🟢 NEW: System Index / Jump To (Replaces Search) */}
+            <div style={{ backgroundColor: '#FFF', border: '4px solid #000', padding: '1.5rem', display: 'inline-block', boxShadow: '8px 8px 0 #E5E7EB' }}>
+              <div style={{ fontWeight: '900', fontFamily: 'monospace', color: '#6B7280', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                // Quick System Index
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <button onClick={(e) => handleJump(e, 'architecture')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '2px solid #DC2626', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'transform 0.1s' }} onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'} onMouseUp={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}>
+                  [ ARCHITECTURE ]
+                </button>
+                <button onClick={(e) => handleJump(e, 'workflow')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#EFF6FF', color: '#2563EB', border: '2px solid #2563EB', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'transform 0.1s' }} onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'} onMouseUp={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}>
+                  [ WORKFLOW ]
+                </button>
+                <button onClick={(e) => handleJump(e, 'modules')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#ECFDF5', color: '#10B981', border: '2px solid #10B981', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'transform 0.1s' }} onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'} onMouseUp={(e) => e.currentTarget.style.transform = 'translate(0, 0)'}>
+                  [ MODULES ]
+                </button>
+              </div>
             </div>
-            <p style={{ fontWeight: 'bold', fontFamily: 'monospace', fontSize: '0.9rem' }}>SYSTEM</p>
           </div>
 
-          <div style={{ fontSize: '2.5rem', fontWeight: '900' }}>+</div>
+          {/* Right Hero Logo/Branding Block */}
+          <div style={{ flex: '0.8', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', padding: '4rem 3rem', border: '4px solid #000000', backgroundColor: '#DBEAFE', boxShadow: '16px 16px 0 #000000', transform: 'rotate(2deg)' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ width: '120px', height: '120px', border: '4px solid #000000', backgroundColor: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '1rem', boxShadow: '6px 6px 0 #000000' }}>
+                  HLE
+                </div>
+                <p style={{ fontWeight: '900', fontFamily: 'monospace', fontSize: '1rem', margin: 0, letterSpacing: '2px' }}>SYSTEM</p>
+              </div>
 
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '120px', height: '120px',
-              border: '3px solid #000000',
-              backgroundColor: '#FFFFFF',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '3rem',
-              marginBottom: '1rem',
-              boxShadow: '4px 4px 0 #000000'
-            }}>
-              🏛️
+              <div style={{ fontSize: '3rem', fontWeight: '900' }}>+</div>
+
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ width: '120px', height: '120px', border: '4px solid #000000', backgroundColor: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem', marginBottom: '1rem', boxShadow: '6px 6px 0 #000000' }}>
+                  🏛️
+                </div>
+                <p style={{ fontWeight: '900', fontFamily: 'monospace', fontSize: '1rem', margin: 0, letterSpacing: '2px' }}>NIIS INST.</p>
+              </div>
             </div>
-            <p style={{ fontWeight: 'bold', fontFamily: 'monospace', fontSize: '0.9rem' }}>UTKAL UNIV</p>
           </div>
+
         </div>
       </div>
 
-      {/* 2. STATS MARQUEE */}
-      <div style={{ 
-        borderTop: '4px solid #000000', 
-        borderBottom: '4px solid #000000', 
-        backgroundColor: '#FBBF24',
-        padding: '2rem 0',
-        overflow: 'hidden'
-      }}>
-        <div style={{ 
-          maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', padding: '0 2rem'
-        }}>
+      {/* =========================================================
+          2. ENTERPRISE SCALE MARQUEE (STATISTICS)
+          ========================================================= */}
+      <div style={{ borderBottom: '4px solid #000', backgroundColor: '#000', padding: '4rem 0', color: '#FFF' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '3rem', padding: '0 2rem' }}>
           {[
-            { label: 'Paperwork Eliminated', value: '100%' },
-            { label: 'Active Students', value: '30+' },
-            { label: 'Avg. Resolution Time', value: '< 24 Hrs' },
-            { label: 'Complaints Resolved', value: '50+' } // 🟢 FIXED: Replaced fake 10k approvals
+            { label: 'ACTIVE HOSTELS', value: '07' },
+            { label: 'TOTAL ROOM CAPACITY', value: '280' },
+            { label: 'REGISTERED USERS', value: '840+' },
+            { label: 'SYSTEM RESOLUTION', value: '<24H' }
           ].map((stat, idx) => (
-            <div key={idx} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', fontWeight: '900', color: '#000000', fontFamily: 'monospace' }}>{stat.value}</div>
-              <div style={{ fontSize: '1rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>{stat.label}</div>
+            <div key={idx} style={{ textAlign: 'center', borderRight: idx !== 3 ? '2px solid #374151' : 'none' }}>
+              <div style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'system-ui', lineHeight: '1', color: '#FBBF24', marginBottom: '1rem' }}>{stat.value}</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: '900', fontFamily: 'monospace', letterSpacing: '2px', color: '#D1D5DB' }}>{stat.label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 3. WHY CHOOSE HLE */}
-      <div style={{ padding: '80px 2rem', backgroundColor: '#F3F4F6' }}>
+      {/* =========================================================
+          3. THE PARADIGM SHIFT (WHY HLE?)
+          ========================================================= */}
+      <div id="architecture" style={{ padding: '8rem 2rem', backgroundColor: '#FFF', borderBottom: '4px solid #000' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '3.5rem', fontWeight: '900', marginBottom: '3rem', letterSpacing: '-1px' }}>Why HLE?</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div style={{ marginBottom: '5rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '4rem', fontWeight: '900', margin: '0 0 1rem 0', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Paradigm Shift</h2>
+            <div style={{ display: 'inline-block', backgroundColor: '#E5E7EB', color: '#000', padding: '0.5rem 1.5rem', fontWeight: '900', fontFamily: 'monospace', fontSize: '1.2rem', border: '3px solid #000' }}>
+              OPERATIONAL BOTTLENECKS VS. HLE DIGITAL ARCHITECTURE
+            </div>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '4rem' }}>
             
-            <div style={{ backgroundColor: '#10B981', padding: '3rem', border: '4px solid #000', boxShadow: '8px 8px 0 #000' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚡</div>
-              <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>Instant Complaints</h3>
-              <p style={{ fontSize: '1.1rem', fontWeight: '500', fontFamily: 'monospace', lineHeight: '1.5' }}>Skip the warden's office. Log maintenance issues, electrical faults, or plumbing requests directly from your phone.</p>
+            {/* Legacy Box */}
+            <div style={{ padding: '3rem', border: '4px solid #DC2626', backgroundColor: '#FEF2F2', boxShadow: '12px 12px 0 #FCA5A5', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-20px', left: '30px', backgroundColor: '#DC2626', color: '#FFF', padding: '0.4rem 1.5rem', fontWeight: '900', fontFamily: 'monospace', fontSize: '1.1rem', border: '3px solid #000', textTransform: 'uppercase' }}>
+                Legacy System [ Failures ]
+              </div>
+              <ul style={{ listStyleType: 'none', padding: 0, margin: '2rem 0 0 0', fontFamily: 'monospace', fontSize: '1.15rem', fontWeight: 'bold', color: '#991B1B', lineHeight: '2.2' }}>
+                {legacyFailures.map((item, i) => (
+                  <li key={i} style={{ marginBottom: '1rem', borderBottom: '2px dashed #FCA5A5', paddingBottom: '1rem' }}>❌ {item}</li>
+                ))}
+              </ul>
             </div>
 
-            <div style={{ backgroundColor: '#A78BFA', padding: '3rem', border: '4px solid #000', boxShadow: '8px 8px 0 #000' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍕</div>
-              <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>Food Hub & Analytics</h3>
-              <p style={{ fontSize: '1.1rem', fontWeight: '500', fontFamily: 'monospace', lineHeight: '1.5' }}>Know what's cooking before you reach the mess. Rate meals daily and view hostel-wide food preference analytics.</p>
-            </div>
-
-            <div style={{ backgroundColor: '#FBCFE8', padding: '3rem', border: '4px solid #000', boxShadow: '8px 8px 0 #000' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
-              <h3 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>Clear Billing</h3>
-              <p style={{ fontSize: '1.1rem', fontWeight: '500', fontFamily: 'monospace', lineHeight: '1.5' }}>No more register books. Track your monthly dues, view detailed payment history, and generate PDF clearance reports.</p>
+            {/* HLE Box */}
+            <div style={{ padding: '3rem', border: '4px solid #10B981', backgroundColor: '#ECFDF5', boxShadow: '12px 12px 0 #6EE7B7', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-20px', left: '30px', backgroundColor: '#10B981', color: '#FFF', padding: '0.4rem 1.5rem', fontWeight: '900', fontFamily: 'monospace', fontSize: '1.1rem', border: '3px solid #000', textTransform: 'uppercase' }}>
+                HLE Architecture [ Solutions ]
+              </div>
+              <ul style={{ listStyleType: 'none', padding: 0, margin: '2rem 0 0 0', fontFamily: 'monospace', fontSize: '1.15rem', fontWeight: 'bold', color: '#065F46', lineHeight: '2.2' }}>
+                {hleSolutions.map((item, i) => (
+                  <li key={i} style={{ marginBottom: '1rem', borderBottom: '2px dashed #6EE7B7', paddingBottom: '1rem' }}>✅ {item}</li>
+                ))}
+              </ul>
             </div>
 
           </div>
         </div>
       </div>
 
-      {/* 4. HOW IT WORKS */}
-      <div style={{ padding: '80px 2rem', backgroundColor: '#FFFFFF', borderTop: '4px solid #000' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '3.5rem', fontWeight: '900', marginBottom: '4rem', letterSpacing: '-1px' }}>How it works.</h2>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', position: 'relative' }}>
-            
-            <div style={{ textAlign: 'left', padding: '2rem', border: '3px solid #000' }}>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#2563EB', fontFamily: 'monospace', marginBottom: '1rem' }}>01.</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Login securely</h3>
-              <p style={{ fontFamily: 'monospace', color: '#4B5563' }}>Access your personalized dashboard based on your role (Student, Warden, or Admin).</p>
-            </div>
-
-            <div style={{ textAlign: 'left', padding: '2rem', border: '3px solid #000' }}>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#DC2626', fontFamily: 'monospace', marginBottom: '1rem' }}>02.</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Take Action</h3>
-              <p style={{ fontFamily: 'monospace', color: '#4B5563' }}>Raise a ticket, vote on the food menu, or check hostel-wide broadcast notices.</p>
-            </div>
-
-            <div style={{ textAlign: 'left', padding: '2rem', border: '3px solid #000', backgroundColor: '#000', color: '#FFF' }}>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#FBBF24', fontFamily: 'monospace', marginBottom: '1rem' }}>03.</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>Get Resolved</h3>
-              <p style={{ fontFamily: 'monospace', color: '#D1D5DB' }}>Caretakers fix the issue and update the status. You get real-time tracking.</p>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* 5. QUICK LINKS (Platform Modules) */}
-      <div style={{ backgroundColor: '#E5E7EB', padding: '80px 2rem', borderTop: '4px solid #000000' }}>
+      {/* =========================================================
+          4. ROLE-BASED EXECUTION PIPELINE (HOW IT WORKS)
+          ========================================================= */}
+      <div id="workflow" style={{ padding: '8rem 2rem', backgroundColor: '#F3F4F6', borderBottom: '4px solid #000' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '2rem', textTransform: 'uppercase' }}>
-            Platform Modules
+          
+          <h2 style={{ fontSize: '4rem', fontWeight: '900', marginBottom: '5rem', textTransform: 'uppercase', letterSpacing: '-2px', textAlign: 'center' }}>
+            Role-Based Execution Pipeline
           </h2>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+            {workflowSteps.map((step, index) => (
+              <div key={index} style={{ backgroundColor: '#FFF', padding: '3rem', border: '4px solid #000', borderTop: `12px solid ${step.color}`, boxShadow: '12px 12px 0 #E5E7EB', position: 'relative' }}>
+                
+                <div style={{ fontSize: '5rem', fontWeight: '900', color: '#F3F4F6', position: 'absolute', top: '10px', right: '20px', lineHeight: '1', zIndex: '0' }}>
+                  {step.step}
+                </div>
+                
+                <div style={{ position: 'relative', zIndex: '1' }}>
+                  <h3 style={{ fontSize: '2rem', fontWeight: '900', textTransform: 'uppercase', marginBottom: '0.5rem', color: '#000' }}>
+                    {step.role}
+                  </h3>
+                  <div style={{ display: 'inline-block', backgroundColor: step.color, color: '#FFF', padding: '0.3rem 0.8rem', fontFamily: 'monospace', fontWeight: '900', fontSize: '0.9rem', marginBottom: '2rem', border: '2px solid #000' }}>
+                    {step.action.toUpperCase()}
+                  </div>
+                  
+                  <ul style={{ listStyleType: 'none', padding: 0, margin: 0, fontFamily: 'monospace', fontWeight: 'bold', color: '#4B5563', lineHeight: '1.8', fontSize: '1rem' }}>
+                    {step.details.map((detail, idx) => (
+                      <li key={idx} style={{ display: 'flex', gap: '0.8rem', marginBottom: '1rem' }}>
+                        <span style={{ color: step.color }}>&gt;</span>
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '1.5rem',
-          }}>
-            {quickLinks.map((item) => (
-              <Link key={item.title} to={item.link === '/public-dashboard' ? '/public-dashboard' : '/login'} style={{ textDecoration: 'none' }}>
-                <div style={{
-                  backgroundColor: 'white',
-                  border: '3px solid #000000',
-                  padding: '2rem',
+        </div>
+      </div>
+
+      {/* =========================================================
+          5. PLATFORM MODULES (SECURED GRID)
+          ========================================================= */}
+      <div id="modules" style={{ backgroundColor: '#FFF', padding: '8rem 2rem', borderBottom: '4px solid #000' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          
+          <div style={{ marginBottom: '5rem' }}>
+            <h2 style={{ fontSize: '4rem', fontWeight: '900', margin: '0 0 1rem 0', textTransform: 'uppercase', letterSpacing: '-2px' }}>
+              System Modules
+            </h2>
+            <p style={{ fontFamily: 'monospace', fontSize: '1.2rem', color: '#4B5563', fontWeight: 'bold' }}>
+              SELECT A MODULE BELOW TO INITIATE SEQUENCE
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '3rem' }}>
+            {platformModules.map((item, index) => (
+              <div 
+                key={index}
+                onClick={() => navigate(item.secured && !user ? '/login' : item.link)}
+                style={{
+                  backgroundColor: '#F9FAFB',
+                  border: '4px solid #000',
+                  padding: '3rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  height: '100%',
-                  boxSizing: 'border-box'
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FBBF24';
-                  e.currentTarget.style.transform = 'translate(-4px, -4px)';
-                  e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
+                  e.currentTarget.style.backgroundColor = '#000';
+                  e.currentTarget.style.color = '#FFF';
+                  e.currentTarget.style.transform = 'translate(-6px, -6px)';
+                  e.currentTarget.style.boxShadow = `12px 12px 0 ${item.color}`;
+                  e.currentTarget.querySelector('.sub').style.color = item.color;
+                  e.currentTarget.querySelector('.desc').style.color = '#D1D5DB';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
+                  e.currentTarget.style.backgroundColor = '#F9FAFB';
+                  e.currentTarget.style.color = '#000';
                   e.currentTarget.style.transform = 'translate(0, 0)';
                   e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.querySelector('.sub').style.color = '#6B7280';
+                  e.currentTarget.querySelector('.desc').style.color = '#111827';
                 }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
-                    <div style={{ fontSize: '2.5rem' }}>{item.icon}</div>
-                    <div>
-                      <h3 style={{ 
-                        fontSize: '1.5rem', fontWeight: '900', marginBottom: '0.5rem', color: '#000000', display: 'flex', alignItems: 'center', gap: '0.5rem',
-                      }}>
-                        {item.title} <span style={{ fontSize: '1.2rem' }}>↗</span>
-                      </h3>
-                      <p style={{ color: '#111827', fontSize: '0.9rem', fontFamily: 'monospace', fontWeight: '500' }}>
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
+              >
+                {/* Security Clearance Badge */}
+                <div style={{ position: 'absolute', top: '20px', right: '20px', backgroundColor: item.secured ? '#FEF2F2' : '#ECFDF5', color: item.secured ? '#DC2626' : '#10B981', padding: '0.4rem 0.8rem', border: '3px solid #000', fontSize: '0.85rem', fontWeight: '900', fontFamily: 'monospace' }}>
+                  {item.secured ? '🔒 REQUIRES CLEARANCE' : '🔓 PUBLIC ACCESS'}
                 </div>
-              </Link>
+
+                <div style={{ fontSize: '4.5rem', marginBottom: '2rem' }}>{item.icon}</div>
+                <h3 style={{ fontSize: '2.2rem', fontWeight: '900', margin: '0 0 0.5rem 0', textTransform: 'uppercase', letterSpacing: '-1px' }}>
+                  {item.title}
+                </h3>
+                <div className="sub" style={{ fontSize: '1rem', fontFamily: 'monospace', fontWeight: '900', color: '#6B7280', marginBottom: '2rem', transition: 'color 0.2s', letterSpacing: '1px' }}>
+                  // {item.subtitle}
+                </div>
+                <p className="desc" style={{ fontFamily: 'monospace', fontSize: '1.1rem', fontWeight: 'bold', color: '#111827', margin: 0, lineHeight: '1.6', transition: 'color 0.2s' }}>
+                  {item.desc}
+                </p>
+                <div style={{ marginTop: '2rem', fontFamily: 'monospace', fontWeight: '900', fontSize: '1rem', color: 'inherit', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  ACCESS MODULE <span style={{ fontSize: '1.5rem' }}>→</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* 6. BIG CALL TO ACTION BEFORE FOOTER */}
+      {/* =========================================================
+          6. NEW: CORE INFRASTRUCTURE & COMPLIANCE (ADDS BULK)
+          ========================================================= */}
+      <div style={{ padding: '8rem 2rem', backgroundColor: '#000', color: '#FFF', borderBottom: '4px solid #000' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '2rem', marginBottom: '4rem' }}>
+            <div>
+              <h2 style={{ fontSize: '3.5rem', fontWeight: '900', margin: '0 0 1rem 0', textTransform: 'uppercase', letterSpacing: '-1px' }}>Security & Infra</h2>
+              <p style={{ fontFamily: 'monospace', fontSize: '1.2rem', color: '#9CA3AF', fontWeight: 'bold', margin: 0 }}>TECHNICAL SPECIFICATIONS FOR ENTERPRISE DEPLOYMENT</p>
+            </div>
+            <div style={{ backgroundColor: '#111827', padding: '1rem 2rem', border: '3px solid #374151', fontFamily: 'monospace', fontWeight: '900', color: '#10B981' }}>
+              SYSTEM STATUS: HEALTHY & SECURE
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            {securityFeatures.map((feat, index) => (
+              <div key={index} style={{ border: '3px solid #374151', padding: '2rem', backgroundColor: '#111827' }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: '900', fontFamily: 'monospace', color: '#38BDF8', marginBottom: '1rem', textTransform: 'uppercase' }}>
+                  {feat.title}
+                </h3>
+                <p style={{ fontFamily: 'system-ui', fontSize: '1.05rem', color: '#D1D5DB', lineHeight: '1.7', margin: 0, fontWeight: '500' }}>
+                  {feat.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================
+          7. BIG CALL TO ACTION (CTA)
+          ========================================================= */}
       {!user && (
-        <div style={{ backgroundColor: '#2563EB', padding: '80px 2rem', textAlign: 'center', borderTop: '4px solid #000' }}>
-          <h2 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '2rem' }}>Ready to upgrade your hostel experience?</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-            <Link to="/register">
-              <button style={{ padding: '1.2rem 3rem', fontSize: '1.2rem', fontWeight: 'bold', border: '3px solid #000', backgroundColor: '#FBBF24', cursor: 'pointer', boxShadow: '6px 6px 0 #000' }}>
-                Create Account
-              </button>
-            </Link>
-            <Link to="/login">
-              <button style={{ padding: '1.2rem 3rem', fontSize: '1.2rem', fontWeight: 'bold', border: '3px solid #000', backgroundColor: '#FFF', cursor: 'pointer', boxShadow: '6px 6px 0 #000' }}>
-                Login
-              </button>
-            </Link>
+        <div style={{ backgroundColor: '#2563EB', padding: '8rem 2rem', textAlign: 'center', backgroundImage: 'radial-gradient(#1E40AF 3px, transparent 3px)', backgroundSize: '40px 40px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: '#FFF', padding: '5rem 3rem', border: '6px solid #000', boxShadow: '20px 20px 0 #000' }}>
+            
+            <h2 style={{ fontSize: '4rem', fontWeight: '900', color: '#000', margin: '0 0 1.5rem 0', textTransform: 'uppercase', letterSpacing: '-2px', lineHeight: '1' }}>
+              Initiate System Access
+            </h2>
+            
+            <p style={{ fontFamily: 'monospace', fontSize: '1.25rem', fontWeight: 'bold', color: '#4B5563', marginBottom: '4rem' }}>
+              SELECT YOUR ASSIGNED CLEARANCE LEVEL TO BEGIN OPERATIONS IN THE NIIS NETWORK.
+            </p>
+            
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+              <Link to="/register" style={{ textDecoration: 'none' }}>
+                <button style={{ padding: '1.5rem 3.5rem', fontSize: '1.3rem', fontWeight: '900', fontFamily: 'monospace', border: '5px solid #000', backgroundColor: '#000', color: '#FFF', cursor: 'pointer', boxShadow: '8px 8px 0 #FBBF24', textTransform: 'uppercase', transition: 'transform 0.1s' }} onMouseDown={(e) => e.currentTarget.style.transform = 'translate(4px,4px)'} onMouseUp={(e) => e.currentTarget.style.transform = 'translate(0,0)'}>
+                  REQUEST CLEARANCE
+                </button>
+              </Link>
+              
+              <Link to="/login" style={{ textDecoration: 'none' }}>
+                <button style={{ padding: '1.5rem 3.5rem', fontSize: '1.3rem', fontWeight: '900', fontFamily: 'monospace', border: '5px solid #000', backgroundColor: '#FFF', color: '#000', cursor: 'pointer', boxShadow: '8px 8px 0 #E5E7EB', textTransform: 'uppercase', transition: 'transform 0.1s' }} onMouseDown={(e) => e.currentTarget.style.transform = 'translate(4px,4px)'} onMouseUp={(e) => e.currentTarget.style.transform = 'translate(0,0)'}>
+                  AUTHORIZED LOGIN
+                </button>
+              </Link>
+            </div>
+
           </div>
         </div>
       )}
 
       <Footer />
+      
+      {/* Required for pulsing animation */}
+      <style>{`
+        @keyframes pulse {
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.2); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
     </div>
   );
 };
