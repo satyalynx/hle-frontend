@@ -11,6 +11,9 @@ const Food = () => {
   const [actions, setActions] = useState([]); 
   const [loading, setLoading] = useState(true);
   
+  // 🟢 NEW: Real-time Expose Meter State
+  const [todayAvgRating, setTodayAvgRating] = useState(null);
+  
   // States for Admin creating a new poll
   const [showPollModal, setShowPollModal] = useState(false);
   const [newPollQuestion, setNewPollQuestion] = useState('');
@@ -20,13 +23,27 @@ const Food = () => {
   const [newActionTitle, setNewActionTitle] = useState('');
 
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  const todayAvgRating = 2.4; 
 
   useEffect(() => {
     fetchMenu();
     fetchPolls();
     fetchActions(); 
+    fetchTodayRating(); // 🟢 Fetching real-time rating
   }, []);
+
+  const fetchTodayRating = async () => {
+    try {
+      // Re-using the analytics endpoint for a single day to get real-time average
+      const response = await axiosInstance.get('/mess/analytics/smart-summary?range=day');
+      if (response.data && response.data.avg_ratings && response.data.avg_ratings.length > 0) {
+        const rating = response.data.avg_ratings[0];
+        setTodayAvgRating(rating > 0 ? rating.toFixed(1) : null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch today rating:', error);
+      setTodayAvgRating(null);
+    }
+  };
 
   const fetchMenu = async () => {
     try {
@@ -48,7 +65,6 @@ const Food = () => {
     }
   };
 
-  // 🟢 FIXED: Fetch Actions with user_id to know their verification votes
   const fetchActions = async () => {
     try {
       const response = await axiosInstance.get(`/mess/actions/?user_id=${user?.id || 0}`);
@@ -60,7 +76,7 @@ const Food = () => {
 
   const handleVote = async (pollId, voteType) => {
     if (user?.role !== 'student') {
-      alert("Only students can vote!");
+      alert("UNAUTHORIZED: Only students are permitted to participate in polls.");
       return;
     }
     
@@ -84,16 +100,15 @@ const Food = () => {
       setNewPollQuestion('');
       setShowPollModal(false);
       fetchPolls();
-      alert("✅ New poll dropped successfully!");
+      alert("POLL PUBLISHED SUCCESSFULLY.");
     } catch (error) {
       console.error('Failed to create poll:', error);
     }
   };
 
-  // 🟢 FIXED: Handle Action Creation with direct click (No Form bug)
   const handleCreateAction = async () => {
     if (!newActionTitle.trim()) {
-      alert("Please enter a task title!");
+      alert("REQUIREMENT MISSING: Enter a task title.");
       return;
     }
 
@@ -102,14 +117,12 @@ const Food = () => {
       setNewActionTitle('');
       setShowActionModal(false);
       fetchActions();
-      alert("✅ Action item added to the board!");
+      alert("ACTION ITEM ADDED.");
     } catch (error) {
       console.error('Failed to create action:', error);
-      alert("Error: " + (error.response?.data?.detail || error.message));
     }
   };
 
-  // Handle Action Status Update (For Admin/Warden)
   const handleStatusChange = async (actionId, newStatus) => {
     try {
       await axiosInstance.put(`/mess/actions/${actionId}/status`, { status: newStatus });
@@ -119,10 +132,9 @@ const Food = () => {
     }
   };
 
-  // 🟢 NEW: Handle Public Audit Voting
   const handleVerifyAction = async (actionId, voteType) => {
     if (user?.role !== 'student') {
-      alert("Only students can verify the management claims!");
+      alert("UNAUTHORIZED: Only students are permitted to execute verification audits.");
       return;
     }
     
@@ -131,61 +143,59 @@ const Food = () => {
         user_id: user.id,
         vote_type: voteType
       });
-      fetchActions(); // Refresh to see if it got auto-reverted!
+      fetchActions(); 
     } catch (error) {
       console.error('Failed to cast verification vote:', error);
     }
   };
 
-  const getMealIcon = (mealType) => {
-    const icons = { breakfast: '🌅', lunch: '☀️', snacks: '☕', dinner: '🌙' };
-    return icons[mealType] || '🍽️';
-  };
+  if (loading) return <div><Navbar /><div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'monospace', fontWeight: 'bold' }}>[SYSTEM SYNCING DATA...]</div></div>;
 
-  if (loading) return <div><Navbar /><div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>Loading Food Hub...</div></div>;
+  // Rating Theme Logic
+  const ratingIsCritical = todayAvgRating !== null && todayAvgRating < 3;
+  const ratingColor = todayAvgRating === null ? '#4B5563' : (ratingIsCritical ? '#DC2626' : '#2563EB');
+  const ratingBg = todayAvgRating === null ? '#F3F4F6' : (ratingIsCritical ? '#FEF2F2' : '#EFF6FF');
 
   return (
-    <div style={{ backgroundColor: '#F3F4F6', minHeight: '100vh', paddingBottom: '3rem' }}>
+    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', paddingBottom: '3rem' }}>
       <Navbar />
       <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', fontFamily: 'system-ui', margin: 0 }}>🍕 Food Hub</h1>
-            <p style={{ fontFamily: 'monospace', color: '#6B7280', fontSize: '1.1rem' }}>Weekly Timetable, Polling & Public Accountability</p>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '900', fontFamily: 'system-ui', margin: 0, textTransform: 'uppercase', letterSpacing: '-1px' }}>Food Hub</h1>
+            <p style={{ fontFamily: 'monospace', color: '#6B7280', fontSize: '1rem', marginTop: '0.2rem' }}>TIMETABLE | POLLING | PUBLIC ACCOUNTABILITY</p>
           </div>
           
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {user?.role === 'student' && (
               <Link to="/my-feedback">
-                <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#10B981', color: 'white', border: '2px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '2px 2px 0 #000' }}>
+                <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#2563EB', color: 'white', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '4px 4px 0 #000' }}>
                   MY FEEDBACK
                 </button>
               </Link>
             )}
 
-            {/* WARDEN & ADMIN SHARED BUTTONS */}
             {(user?.role === 'warden' || user?.role === 'admin') && (
               <>
-                <button onClick={() => setShowPollModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#F59E0B', color: '#000', border: '2px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '2px 2px 0 #000' }}>
-                  ➕ DROP NEW POLL
+                <button onClick={() => setShowPollModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FACC15', color: '#000', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '4px 4px 0 #000' }}>
+                  CREATE POLL
                 </button>
                 <Link to="/mess-analytics">
-                  <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#7C3AED', color: 'white', border: '2px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '2px 2px 0 #000' }}>
-                    📊 ANALYTICS
+                  <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#000', color: 'white', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '4px 4px 0 #4B5563' }}>
+                    SYSTEM ANALYTICS
                   </button>
                 </Link>
               </>
             )}
 
-            {/* 🟢 STRICTLY ADMIN ONLY BUTTONS */}
             {user?.role === 'admin' && (
               <>
-                <button onClick={() => setShowActionModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '2px 2px 0 #000' }}>
-                  ➕ ADD ACTION
+                <button onClick={() => setShowActionModal(true)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FFF', color: '#000', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '4px 4px 0 #000' }}>
+                  NEW ACTION ITEM
                 </button>
                 <Link to="/upload-menu">
-                  <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#2563EB', color: 'white', border: '2px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '2px 2px 0 #000' }}>
+                  <button style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FFF', color: '#000', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', boxShadow: '4px 4px 0 #000' }}>
                     UPDATE TIMETABLE
                   </button>
                 </Link>
@@ -194,17 +204,18 @@ const Food = () => {
           </div>
         </div>
 
-        <div style={{ backgroundColor: todayAvgRating >= 3 ? '#D1FAE5' : '#FEE2E2', border: `3px solid ${todayAvgRating >= 3 ? '#10B981' : '#DC2626'}`, padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '4px 4px 0 #000' }}>
+        {/* 🟢 REAL-TIME EXPOSE METER */}
+        <div style={{ backgroundColor: ratingBg, border: `4px solid ${ratingColor}`, padding: '1.5rem 2rem', marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: `6px 6px 0 ${ratingColor}` }}>
           <div>
-            <h2 style={{ margin: 0, fontFamily: 'system-ui', color: todayAvgRating >= 3 ? '#065F46' : '#991B1B' }}>
-              🚨 Public Expose Meter (Today's Quality)
+            <h2 style={{ margin: 0, fontFamily: 'monospace', fontWeight: '900', color: ratingColor, textTransform: 'uppercase' }}>
+              PUBLIC EXPOSE METER
             </h2>
-            <p style={{ fontFamily: 'monospace', color: todayAvgRating >= 3 ? '#065F46' : '#991B1B', margin: '0.5rem 0 0 0' }}>
-              Based on real-time student ratings. Admin cannot hide this.
+            <p style={{ fontFamily: 'monospace', color: '#4B5563', margin: '0.5rem 0 0 0', fontWeight: 'bold' }}>
+              REAL-TIME CUMULATIVE STUDENT RATING. UNFILTERED.
             </p>
           </div>
-          <div style={{ fontSize: '3rem', fontWeight: 'bold', fontFamily: 'monospace', color: todayAvgRating >= 3 ? '#10B981' : '#DC2626' }}>
-            {todayAvgRating} / 5 ⭐
+          <div style={{ fontSize: '3rem', fontWeight: '900', fontFamily: 'monospace', color: ratingColor }}>
+            {todayAvgRating === null ? '[AWAITING DATA]' : `${todayAvgRating} / 5`}
           </div>
         </div>
 
@@ -212,37 +223,36 @@ const Food = () => {
           
           {/* LEFT COLUMN: MENU */}
           <div style={{ flex: '2', minWidth: '350px' }}>
-            <h2 style={{ fontFamily: 'system-ui', fontWeight: 'bold', marginBottom: '1rem', borderBottom: '3px solid #000', paddingBottom: '0.5rem' }}>
-              Routine for Today ({currentDay})
+            <h2 style={{ fontFamily: 'monospace', fontWeight: '900', marginBottom: '1.5rem', textTransform: 'uppercase', backgroundColor: '#000', color: '#FFF', padding: '0.5rem 1rem', display: 'inline-block' }}>
+              ROUTINE: {currentDay}
             </h2>
             
             {menu.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: 'white', border: '3px solid #000', boxShadow: '4px 4px 0 #000' }}>
-                <p style={{ fontSize: '1.25rem', color: '#6B7280', fontFamily: 'monospace' }}>No routine found for {currentDay}.</p>
+              <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: 'white', border: '4px solid #000', boxShadow: '6px 6px 0 #000' }}>
+                <p style={{ fontSize: '1.2rem', color: '#6B7280', fontFamily: 'monospace', fontWeight: 'bold' }}>NO ACTIVE ROUTINE LOGGED FOR TODAY.</p>
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '1.5rem' }}>
                 {menu.map((meal) => (
-                  <div key={meal.id} style={{ backgroundColor: 'white', padding: '1.5rem', border: '3px solid #000', boxShadow: '4px 4px 0 #000' }}>
+                  <div key={meal.id} style={{ backgroundColor: 'white', padding: '1.5rem', border: '4px solid #000', boxShadow: '6px 6px 0 #000' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{getMealIcon(meal.meal_type)}</div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', textTransform: 'capitalize', margin: '0 0 1rem 0', fontFamily: 'system-ui' }}>
-                          {meal.meal_type}
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: '900', textTransform: 'uppercase', margin: '0 0 1rem 0', fontFamily: 'monospace', color: '#111827' }}>
+                          [{meal.meal_type}]
                         </h3>
                       </div>
                       {user?.role === 'student' && (
                         <Link to={`/rate-meal/${meal.id}`}>
-                          <button style={{ padding: '0.5rem 1rem', backgroundColor: '#000', color: 'white', border: 'none', fontWeight: 'bold', fontFamily: 'monospace', cursor: 'pointer' }}>
-                            RATE / EXPOSE
+                          <button style={{ padding: '0.5rem 1.5rem', backgroundColor: '#000', color: 'white', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.target.style.backgroundColor = '#DC2626'; e.target.style.borderColor = '#DC2626'; }} onMouseLeave={(e) => { e.target.style.backgroundColor = '#000'; e.target.style.borderColor = '#000'; }}>
+                            SUBMIT AUDIT
                           </button>
                         </Link>
                       )}
                     </div>
                     <div style={{ color: '#374151', fontFamily: 'monospace', fontSize: '1.1rem', marginTop: user?.role !== 'student' ? '1rem' : '0' }}>
                       {meal.items.split(',').map((item, index) => (
-                        <div key={index} style={{ padding: '0.5rem 0', borderBottom: index < meal.items.split(',').length - 1 ? '1px dashed #D1D5DB' : 'none' }}>
-                          🍽️ {item.trim()}
+                        <div key={index} style={{ padding: '0.5rem 0', borderBottom: index < meal.items.split(',').length - 1 ? '2px dashed #E5E7EB' : 'none', fontWeight: 'bold' }}>
+                          - {item.trim()}
                         </div>
                       ))}
                     </div>
@@ -256,16 +266,14 @@ const Food = () => {
           <div style={{ flex: '1', minWidth: '350px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             
             {/* DEMOCRATIC POLLING */}
-            <div style={{ backgroundColor: 'white', padding: '1.5rem', border: '3px solid #000', boxShadow: '4px 4px 0 #000' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ margin: 0, fontFamily: 'system-ui', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🗳️ Live Polling
-                </h3>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: '#6B7280', fontFamily: 'monospace', marginBottom: '1rem' }}>Admin decisions based on student votes.</p>
+            <div style={{ backgroundColor: 'white', padding: '1.5rem', border: '4px solid #000', boxShadow: '6px 6px 0 #000' }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontFamily: 'monospace', fontWeight: '900', textTransform: 'uppercase' }}>
+                ACTIVE POLLING
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#4B5563', fontFamily: 'monospace', marginBottom: '1.5rem', fontWeight: 'bold' }}>SYSTEM: DEMOCRATIC RESOURCE ALLOCATION</p>
               
               {polls.length === 0 ? (
-                 <p style={{ fontFamily: 'monospace', color: '#6B7280', textAlign: 'center', padding: '1rem', backgroundColor: '#F9FAFB', border: '2px dashed #D1D5DB' }}>No active polls right now.</p>
+                 <p style={{ fontFamily: 'monospace', color: '#6B7280', textAlign: 'center', padding: '1.5rem', backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', fontWeight: 'bold' }}>NO ACTIVE POLLS.</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   {polls.map(poll => {
@@ -274,39 +282,39 @@ const Food = () => {
                     const downPercent = totalVotes > 0 ? Math.round((poll.downvotes / totalVotes) * 100) : 0;
 
                     return (
-                      <div key={poll.id} style={{ padding: '1rem', border: '2px solid #000', backgroundColor: '#F9FAFB' }}>
-                        <p style={{ fontWeight: 'bold', fontFamily: 'monospace', marginBottom: '1rem', fontSize: '1rem' }}>{poll.question}</p>
+                      <div key={poll.id} style={{ padding: '1.5rem', border: '3px solid #000', backgroundColor: '#F9FAFB' }}>
+                        <p style={{ fontWeight: '900', fontFamily: 'system-ui', marginBottom: '1.5rem', fontSize: '1.1rem' }}>{poll.question}</p>
                         
-                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                           <button 
                             onClick={() => handleVote(poll.id, 'upvote')}
                             style={{ 
-                              flex: 1, padding: '0.5rem', 
-                              backgroundColor: poll.user_voted === 'upvote' ? '#10B981' : '#D1FAE5', 
-                              color: poll.user_voted === 'upvote' ? 'white' : '#065F46', 
-                              border: '2px solid #10B981', fontWeight: 'bold', 
+                              flex: 1, padding: '0.75rem', 
+                              backgroundColor: poll.user_voted === 'upvote' ? '#000' : '#FFF', 
+                              color: poll.user_voted === 'upvote' ? '#FFF' : '#000', 
+                              border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace',
                               cursor: user?.role === 'student' ? 'pointer' : 'not-allowed',
-                              opacity: user?.role !== 'student' ? 0.7 : 1
+                              opacity: user?.role !== 'student' ? 0.5 : 1
                             }}>
-                            👍 {poll.upvotes}
+                            AGREE ({poll.upvotes})
                           </button>
                           
                           <button 
                             onClick={() => handleVote(poll.id, 'downvote')}
                             style={{ 
-                              flex: 1, padding: '0.5rem', 
-                              backgroundColor: poll.user_voted === 'downvote' ? '#DC2626' : '#FEE2E2', 
-                              color: poll.user_voted === 'downvote' ? 'white' : '#991B1B', 
-                              border: '2px solid #DC2626', fontWeight: 'bold', 
+                              flex: 1, padding: '0.75rem', 
+                              backgroundColor: poll.user_voted === 'downvote' ? '#000' : '#FFF', 
+                              color: poll.user_voted === 'downvote' ? '#FFF' : '#000', 
+                              border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace',
                               cursor: user?.role === 'student' ? 'pointer' : 'not-allowed',
-                              opacity: user?.role !== 'student' ? 0.7 : 1
+                              opacity: user?.role !== 'student' ? 0.5 : 1
                             }}>
-                            👎 {poll.downvotes}
+                            DISAGREE ({poll.downvotes})
                           </button>
                         </div>
                         
-                        <div style={{ display: 'flex', height: '8px', width: '100%', backgroundColor: '#E5E7EB', overflow: 'hidden', border: '1px solid #000' }}>
-                          <div style={{ width: `${upPercent}%`, backgroundColor: '#10B981', transition: 'width 0.3s ease' }}></div>
+                        <div style={{ display: 'flex', height: '10px', width: '100%', backgroundColor: '#E5E7EB', overflow: 'hidden', border: '2px solid #000' }}>
+                          <div style={{ width: `${upPercent}%`, backgroundColor: '#2563EB', transition: 'width 0.3s ease' }}></div>
                           <div style={{ width: `${downPercent}%`, backgroundColor: '#DC2626', transition: 'width 0.3s ease' }}></div>
                         </div>
                       </div>
@@ -316,39 +324,36 @@ const Food = () => {
               )}
             </div>
 
-            {/* 🟢 ACTION BOARD WITH PUBLIC AUDIT */}
-            <div style={{ backgroundColor: 'white', padding: '1.5rem', border: '3px solid #000', boxShadow: '4px 4px 0 #000' }}>
-              <h3 style={{ margin: '0 0 1rem 0', fontFamily: 'system-ui', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                🛠️ Action Board
+            {/* ACTION BOARD WITH PUBLIC AUDIT */}
+            <div style={{ backgroundColor: 'white', padding: '1.5rem', border: '4px solid #000', boxShadow: '6px 6px 0 #000' }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontFamily: 'monospace', fontWeight: '900', textTransform: 'uppercase' }}>
+                ACTION BOARD
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#6B7280', fontFamily: 'monospace', marginBottom: '1rem' }}>Live tracking of management initiatives.</p>
+              <p style={{ fontSize: '0.85rem', color: '#4B5563', fontFamily: 'monospace', marginBottom: '1.5rem', fontWeight: 'bold' }}>TRACKING INITIATIVE EXECUTION</p>
               
               {actions.length === 0 ? (
-                 <p style={{ fontFamily: 'monospace', color: '#6B7280', textAlign: 'center', padding: '1rem', backgroundColor: '#F9FAFB', border: '2px dashed #D1D5DB' }}>No active improvement tasks right now.</p>
+                 <p style={{ fontFamily: 'monospace', color: '#6B7280', textAlign: 'center', padding: '1.5rem', backgroundColor: '#F9FAFB', border: '2px dashed #9CA3AF', fontWeight: 'bold' }}>NO ACTIVE INITIATIVES.</p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   {actions.map(action => {
-                    // Logic for Status Colors
-                    let statusColor = '#9CA3AF'; // Under Review
-                    let statusIcon = '📝';
-                    if (action.status === 'In Progress') { statusColor = '#3B82F6'; statusIcon = '⚙️'; }
-                    else if (action.status === 'Claimed Resolved') { statusColor = '#F59E0B'; statusIcon = '⏳'; }
+                    let statusColor = '#000'; // Default Brutalist
+                    if (action.status === 'In Progress') statusColor = '#2563EB'; // Blue
+                    else if (action.status === 'Claimed Resolved') statusColor = '#FACC15'; // Yellow Warning
 
                     return (
-                      <div key={action.id} style={{ padding: '1rem', border: `2px solid ${statusColor}`, borderLeft: `8px solid ${statusColor}`, backgroundColor: '#F9FAFB' }}>
-                        <p style={{ fontWeight: 'bold', margin: '0 0 0.5rem 0', fontFamily: 'system-ui' }}>{action.title}</p>
+                      <div key={action.id} style={{ padding: '1.25rem', border: '3px solid #000', borderLeft: `8px solid ${statusColor}`, backgroundColor: '#F9FAFB' }}>
+                        <p style={{ fontWeight: '900', margin: '0 0 1rem 0', fontFamily: 'system-ui', fontSize: '1.1rem' }}>{action.title}</p>
                         
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', fontFamily: 'monospace' }}>
-                          <span style={{ color: statusColor === '#9CA3AF' ? '#4B5563' : statusColor, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            {statusIcon} {action.status}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem', fontFamily: 'monospace' }}>
+                          <span style={{ color: statusColor, fontWeight: '900', textTransform: 'uppercase' }}>
+                            [{action.status}]
                           </span>
                           
-                          {/* Admin controls to update status */}
                           {(user?.role === 'admin' || user?.role === 'warden') && (
                             <select 
                               value={action.status}
                               onChange={(e) => handleStatusChange(action.id, e.target.value)}
-                              style={{ padding: '0.25rem', fontFamily: 'monospace', border: '2px solid #000', cursor: 'pointer', outline: 'none' }}
+                              style={{ padding: '0.4rem', fontFamily: 'monospace', border: '2px solid #000', cursor: 'pointer', outline: 'none', fontWeight: 'bold' }}
                             >
                               <option value="Under Review">Under Review</option>
                               <option value="In Progress">In Progress</option>
@@ -357,45 +362,41 @@ const Food = () => {
                           )}
                         </div>
 
-                        {/* 🟢 THE AUDIT BOX: Shows up only when Admin claims it's resolved */}
+                        {/* THE AUDIT BOX */}
                         {action.status === 'Claimed Resolved' && (
-                          <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#FFFBEB', border: '2px dashed #F59E0B' }}>
-                            <p style={{ margin: '0 0 0.5rem 0', fontFamily: 'monospace', fontWeight: 'bold', color: '#B45309', fontSize: '0.85rem' }}>
-                              Management claims this is fixed. Verify?
+                          <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#FFF', border: '3px dashed #000' }}>
+                            <p style={{ margin: '0 0 1rem 0', fontFamily: 'monospace', fontWeight: '900', color: '#000', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                              SYSTEM AUDIT REQUIRED. VERIFY EXECUTION?
                             </p>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
                               <button 
                                 onClick={() => handleVerifyAction(action.id, 'yes')}
                                 style={{ 
-                                  flex: 1, padding: '0.5rem', 
-                                  backgroundColor: action.user_voted === 'yes' ? '#10B981' : '#D1FAE5', 
-                                  color: action.user_voted === 'yes' ? 'white' : '#065F46', 
-                                  border: '2px solid #10B981', fontWeight: 'bold', fontSize: '0.8rem',
+                                  flex: 1, padding: '0.6rem', 
+                                  backgroundColor: action.user_voted === 'yes' ? '#000' : '#FFF', 
+                                  color: action.user_voted === 'yes' ? '#FFF' : '#000', 
+                                  border: '2px solid #000', fontWeight: '900', fontSize: '0.85rem', fontFamily: 'monospace',
                                   cursor: user?.role === 'student' ? 'pointer' : 'not-allowed',
-                                  opacity: user?.role !== 'student' ? 0.7 : 1
+                                  opacity: user?.role !== 'student' ? 0.5 : 1
                                 }}>
-                                👍 Yes ({action.yes_votes})
+                                VERIFY ({action.yes_votes})
                               </button>
                               
                               <button 
                                 onClick={() => handleVerifyAction(action.id, 'no')}
                                 style={{ 
-                                  flex: 1, padding: '0.5rem', 
-                                  backgroundColor: action.user_voted === 'no' ? '#DC2626' : '#FEE2E2', 
-                                  color: action.user_voted === 'no' ? 'white' : '#991B1B', 
-                                  border: '2px solid #DC2626', fontWeight: 'bold', fontSize: '0.8rem',
+                                  flex: 1, padding: '0.6rem', 
+                                  backgroundColor: action.user_voted === 'no' ? '#DC2626' : '#FFF', 
+                                  color: action.user_voted === 'no' ? '#FFF' : '#DC2626', 
+                                  border: `2px solid ${action.user_voted === 'no' ? '#DC2626' : '#000'}`, fontWeight: '900', fontSize: '0.85rem', fontFamily: 'monospace',
                                   cursor: user?.role === 'student' ? 'pointer' : 'not-allowed',
-                                  opacity: user?.role !== 'student' ? 0.7 : 1
+                                  opacity: user?.role !== 'student' ? 0.5 : 1
                                 }}>
-                                👎 Fake ({action.no_votes})
+                                REJECT ({action.no_votes})
                               </button>
                             </div>
-                            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.7rem', color: '#6B7280', fontFamily: 'monospace', textAlign: 'center' }}>
-                              If 5 students vote 'Fake', this reverts to In Progress.
-                            </p>
                           </div>
                         )}
-
                       </div>
                     );
                   })}
@@ -411,29 +412,29 @@ const Food = () => {
       {showPollModal && (
         <div 
           onClick={() => setShowPollModal(false)} 
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}
         >
           <div 
             onClick={(e) => e.stopPropagation()} 
-            style={{ backgroundColor: 'white', padding: '2rem', border: '4px solid #000', width: '90%', maxWidth: '500px', boxShadow: '8px 8px 0 #000', position: 'relative', pointerEvents: 'auto' }}
+            style={{ backgroundColor: 'white', padding: '2.5rem', border: '4px solid #000', width: '90%', maxWidth: '500px', boxShadow: '12px 12px 0 #000', position: 'relative' }}
           >
-            <h2 style={{ fontFamily: 'system-ui', margin: '0 0 1rem 0' }}>Drop a New Poll</h2>
+            <h2 style={{ fontFamily: 'monospace', fontWeight: '900', margin: '0 0 1.5rem 0', textTransform: 'uppercase' }}>INITIALIZE POLL</h2>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontFamily: 'monospace', fontWeight: 'bold' }}>Question / Proposal:</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontFamily: 'monospace', fontWeight: 'bold' }}>PROPOSAL PARAMETERS:</label>
               <textarea 
                 value={newPollQuestion}
                 onChange={(e) => setNewPollQuestion(e.target.value)}
-                placeholder="e.g., Should we replace Sunday Chowmein with Biryani?"
+                placeholder="Enter policy or menu proposal..."
                 rows={4}
                 required
-                style={{ width: '100%', boxSizing: 'border-box', padding: '0.75rem', border: '2px solid #000', fontFamily: 'monospace', marginBottom: '1.5rem', resize: 'none' }}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '1rem', border: '3px solid #000', fontFamily: 'monospace', marginBottom: '2rem', resize: 'none', fontWeight: 'bold' }}
               />
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="button" onClick={handleCreatePoll} style={{ flex: 1, padding: '0.75rem', backgroundColor: '#10B981', color: 'white', border: '2px solid #000', fontWeight: 'bold', cursor: 'pointer' }}>
-                  PUBLISH POLL
+                <button type="button" onClick={handleCreatePoll} style={{ flex: 1, padding: '1rem', backgroundColor: '#000', color: 'white', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer' }}>
+                  PUBLISH
                 </button>
-                <button type="button" onClick={() => setShowPollModal(false)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: 'bold', cursor: 'pointer' }}>
-                  CANCEL
+                <button type="button" onClick={() => setShowPollModal(false)} style={{ padding: '1rem 2rem', backgroundColor: '#FFF', color: '#000', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer' }}>
+                  ABORT
                 </button>
               </div>
             </div>
@@ -445,28 +446,28 @@ const Food = () => {
       {showActionModal && (
         <div 
           onClick={() => setShowActionModal(false)} 
-          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}
         >
           <div 
             onClick={(e) => e.stopPropagation()} 
-            style={{ backgroundColor: 'white', padding: '2rem', border: '4px solid #000', width: '90%', maxWidth: '500px', boxShadow: '8px 8px 0 #000', position: 'relative', pointerEvents: 'auto' }}
+            style={{ backgroundColor: 'white', padding: '2.5rem', border: '4px solid #000', width: '90%', maxWidth: '500px', boxShadow: '12px 12px 0 #000', position: 'relative' }}
           >
-            <h2 style={{ fontFamily: 'system-ui', margin: '0 0 1rem 0' }}>Add Improvement Task</h2>
+            <h2 style={{ fontFamily: 'monospace', fontWeight: '900', margin: '0 0 1.5rem 0', textTransform: 'uppercase' }}>LOG ACTION ITEM</h2>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontFamily: 'monospace', fontWeight: 'bold' }}>Task Title / Objective:</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontFamily: 'monospace', fontWeight: 'bold' }}>OBJECTIVE IDENTIFIER:</label>
               <input 
                 type="text"
                 value={newActionTitle}
                 onChange={(e) => setNewActionTitle(e.target.value)}
-                placeholder="e.g., Quality check for rice vendor"
-                style={{ width: '100%', boxSizing: 'border-box', padding: '0.75rem', border: '2px solid #000', fontFamily: 'monospace', marginBottom: '1.5rem' }}
+                placeholder="Enter task definition..."
+                style={{ width: '100%', boxSizing: 'border-box', padding: '1rem', border: '3px solid #000', fontFamily: 'monospace', marginBottom: '2rem', fontWeight: 'bold' }}
               />
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="button" onClick={handleCreateAction} style={{ flex: 1, padding: '0.75rem', backgroundColor: '#3B82F6', color: 'white', border: '2px solid #000', fontWeight: 'bold', cursor: 'pointer' }}>
-                  ADD TASK
+                <button type="button" onClick={handleCreateAction} style={{ flex: 1, padding: '1rem', backgroundColor: '#000', color: 'white', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer' }}>
+                  EXECUTE
                 </button>
-                <button type="button" onClick={() => setShowActionModal(false)} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: 'bold', cursor: 'pointer' }}>
-                  CANCEL
+                <button type="button" onClick={() => setShowActionModal(false)} style={{ padding: '1rem 2rem', backgroundColor: '#FFF', color: '#000', border: '3px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer' }}>
+                  ABORT
                 </button>
               </div>
             </div>
