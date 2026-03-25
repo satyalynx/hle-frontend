@@ -209,13 +209,13 @@ const Homepage = () => {
                 // QUICK SYSTEM INDEX NAVIGATION
               </div>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <button onClick={(e) => handleJump(e, 'architecture')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #2563EB'}} style={{ boxShadow: '4px 4px 0 #2563EB' }}>
+                <button onClick={(e) => handleJump(e, 'architecture')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem', boxShadow: '4px 4px 0 #2563EB' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #2563EB'}}>
                   [01] ARCHITECTURE
                 </button>
-                <button onClick={(e) => handleJump(e, 'workflow')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #DC2626'}} style={{ boxShadow: '4px 4px 0 #DC2626' }}>
+                <button onClick={(e) => handleJump(e, 'workflow')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem', boxShadow: '4px 4px 0 #DC2626' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #DC2626'}}>
                   [02] WORKFLOWS
                 </button>
-                <button onClick={(e) => handleJump(e, 'modules')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #10B981'}} style={{ boxShadow: '4px 4px 0 #10B981' }}>
+                <button onClick={(e) => handleJump(e, 'modules')} style={{ padding: '0.6rem 1.2rem', backgroundColor: '#FFF', color: '#000', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', transition: 'all 0.1s', fontSize: '0.85rem', boxShadow: '4px 4px 0 #10B981' }} onMouseDown={(e) => {e.currentTarget.style.transform='translate(2px,2px)'; e.currentTarget.style.boxShadow='none'}} onMouseUp={(e) => {e.currentTarget.style.transform='translate(0,0)'; e.currentTarget.style.boxShadow='4px 4px 0 #10B981'}}>
                   [03] PLATFORM MODULES
                 </button>
               </div>
@@ -228,11 +228,11 @@ const Homepage = () => {
               <h3 style={{ fontSize: '1.2rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 1.5rem 0', textTransform: 'uppercase', borderBottom: '4px solid #000', paddingBottom: '0.5rem' }}>Network Capacity Limits</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', fontFamily: 'monospace' }}>
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#6B7280', fontWeight: '900', textTransform: 'uppercase' }}>MAX USERS</div>
+                  <div style={{ fontSize: '0.9rem', color: '#6B7280', fontWeight: '900', textTransform: 'uppercase' }}>MAX USERS</div>
                   <div style={{ fontSize: '3rem', fontWeight: '900', color: '#2563EB', lineHeight: '1' }}>840+</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#6B7280', fontWeight: '900', textTransform: 'uppercase' }}>TRACKED ROOMS</div>
+                  <div style={{ fontSize: '0.9rem', color: '#6B7280', fontWeight: '900', textTransform: 'uppercase' }}>TRACKED ROOMS</div>
                   <div style={{ fontSize: '3rem', fontWeight: '900', color: '#DC2626', lineHeight: '1' }}>280</div>
                 </div>
                 <div>
@@ -477,7 +477,7 @@ const Homepage = () => {
       {/* --- TERMINAL INITIATION (CALL TO ACTION) --- */}
       {!user && (
         <div style={{ backgroundColor: '#2563EB', padding: '6rem 2rem', textAlign: 'center', borderTop: '4px solid #000', backgroundImage: 'radial-gradient(#1E40AF 3px, transparent 3px)', backgroundSize: '30px 30px' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: '#FFF', padding: '4rem 2rem', border: '6px solid #000', boxShadow: '16px 16px 0 #000' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: '#FFF', padding: '5rem 3rem', border: '6px solid #000', boxShadow: '16px 16px 0 #000' }}>
             
             <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', fontWeight: '900', color: '#6B7280', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
               // Authentication Gateway
