@@ -3,157 +3,146 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const About = () => {
+  // ==========================================
+  // DATA STRUCTURES (HEAVY DOCUMENTATION)
+  // ==========================================
+
   const teamMembers = [
     {
       name: 'Satya Ranjan Rana',
-      role: 'Project Lead & Full-Stack Developer',
-      image: '/team/satya.jpg', // Replace with actual image path
-      description: 'Architected the complete system infrastructure and led end-to-end development of HLE.',
-      skills: 'React • FastAPI • PostgreSQL • System Design',
+      role: 'Project Lead & Backend Architect',
+      image: 'S', 
+      description: 'Engineered the core REST API, JWT cryptographic security layers, database schema, and asynchronous live telemetry endpoints.',
+      responsibilities: ['API Gateway Design', 'Auth Flow (OTP/JWT)', 'Database Migration', 'System Deployment'],
+      skills: 'FastAPI • Python • SQLite/PostgreSQL • System Architecture',
+      borderColor: '#DC2626',
+      bgColor: '#FEF2F2'
     },
     {
       name: 'Soumya Srikant Majhi',
-      role: 'Backend Developer',
-      image: '/team/soumya.jpg', // Replace with actual image path
-      description: 'Developed robust backend APIs and implemented real-time complaint tracking systems.',
-      skills: 'FastAPI • WebSockets • API Development',
+      role: 'UI/UX & System Documentation',
+      image: 'M',
+      description: 'Designed the brutalist enterprise interface guidelines and compiled comprehensive technical documentation for the entire project lifecycle.',
+      responsibilities: ['Wireframing', 'Brutalist UI Guidelines', 'User Flow Optimization', 'Technical Docs'],
+      skills: 'UI/UX Design • Figma • Technical Writing • Human-Computer Interaction',
+      borderColor: '#2563EB',
+      bgColor: '#EFF6FF'
     },
     {
       name: 'Krushna Chandra Sahoo',
-      role: 'Frontend Developer',
-      image: '/team/krushna.jpg', // Replace with actual image path
-      description: 'Built responsive user interfaces and implemented interactive dashboard components.',
-      skills: 'React • JavaScript • UI Components',
+      role: 'Frontend Development',
+      image: 'K',
+      description: 'Implemented modular React components, complex state management, and integrated secure backend APIs with the client interface.',
+      responsibilities: ['Component Architecture', 'State Management (Context API)', 'Axios Interceptors', 'Routing'],
+      skills: 'React.js • JavaScript (ES6+) • CSS/Inline Styling • DOM Manipulation',
+      borderColor: '#10B981',
+      bgColor: '#ECFDF5'
     },
     {
       name: 'Subhransu Biswal',
-      role: 'UI/UX Designer & Database Architect',
-      image: '/team/subhransu.jpg', // Replace with actual image path
-      description: 'Designed the modern retro aesthetic and architected the PostgreSQL database schema.',
-      skills: 'Database Design • UI/UX • System Architecture',
+      role: 'Database & Network Ops',
+      image: 'B',
+      description: 'Managed relational database modeling, complex query optimization, cloud hosting deployments, and network routing policies.',
+      responsibilities: ['Schema Normalization', 'Index Optimization', 'Server Maintenance', 'Vercel/Render CI/CD'],
+      skills: 'Relational Databases • Cloud Ops • CI/CD Pipelines • Network Security',
+      borderColor: '#F59E0B',
+      bgColor: '#FFFBEB'
     },
   ];
 
   const features = [
     {
-      icon: '🗺️',
-      title: 'Maintenance Heatmap',
-      description: 'Visual mapping of problem areas across hostel blocks with color-coded zones identifying maintenance hotspots and recurring issues.',
+      id: 'MOD-01',
+      title: 'LIVE COMMAND CENTER',
+      subtitle: 'Real-time Infrastructure Telemetry',
+      description: 'A live telemetry heatmap that actively monitors infrastructure faults across all building blocks. It flags chronic issues through algorithmic detection and tracks the operational queue of maintenance staff in real-time, ensuring strict SLAs (Service Level Agreements) are met.',
     },
     {
-      icon: '🎤',
-      title: 'Voice Complaints',
-      description: 'AI-powered speech-to-text technology enabling students to report issues in Hindi or English, making the system accessible to everyone.',
+      id: 'MOD-02',
+      title: 'MASTER FINANCE LEDGER',
+      subtitle: 'Secure Institutional Accounting',
+      description: 'A secure financial clearinghouse handling vendor payouts, maintenance budgets, and institutional fee records. Features strict role-based clearance levels, restricting final settlement authorization exclusively to High-Level System Administrators to prevent financial discrepancies.',
     },
     {
-      icon: '📸',
-      title: 'Photo Verification',
-      description: 'Mandatory before/after photo system ensuring accountability and providing visual proof of completed maintenance work.',
+      id: 'MOD-03',
+      title: 'PUBLIC EXPOSE METER',
+      subtitle: 'Immutable Public Audit System',
+      description: 'An immutable, real-time public rating system for the mess and catering facility. It aggregates daily student feedback into a global performance metric (Mess Performance Index). This data is strictly read-only for administrators, enforcing absolute transparency and quality compliance.',
     },
     {
-      icon: '🌐',
-      title: 'Live Public Dashboard',
-      description: 'Real-time complaint tracking visible to all stakeholders with auto-refresh capabilities ensuring complete transparency.',
+      id: 'MOD-04',
+      title: 'SYSTEM BROADCASTS',
+      subtitle: 'Emergency & Routine Directives',
+      description: 'An official directive transmission network. Replaces legacy physical notice boards with high-priority digital alerts. Broadcasts are categorized by severity (General, Urgent, Maintenance) and instantly pushed to all registered client terminals to ensure critical information delivery.',
+    },
+  ];
+
+  const securityProtocols = [
+    {
+      title: 'CRYPTOGRAPHIC AUTHENTICATION',
+      detail: 'Utilization of JSON Web Tokens (JWT) with HS256 algorithm for stateless, secure session management. Passwords are salted and hashed using bcrypt before persistence.'
     },
     {
-      icon: '📊',
-      title: 'AI Mess Analytics',
-      description: 'Sentiment analysis of food feedback with automatic categorization helping mess committees improve food quality based on data.',
+      title: 'MULTI-FACTOR VERIFICATION',
+      detail: 'Integration of Brevo SMTP engine to deliver time-sensitive, one-time passwords (OTP) for identity verification during terminal access attempts.'
     },
+    {
+      title: 'ROLE-BASED ACCESS CONTROL (RBAC)',
+      detail: 'Strict architectural segregation between Student, Caretaker, Warden, and Admin privileges. Route guarding at both the React Router layer and FastAPI endpoint layer.'
+    },
+    {
+      title: 'DATA INTEGRITY',
+      detail: 'Implementation of SQLAlchemy ORM to prevent SQL Injection attacks. Strict schema validation using Pydantic models to ensure payload consistency.'
+    }
+  ];
+
+  const apiInfrastructure = [
+    { route: '/auth/*', method: 'POST', purpose: 'Identity verification, JWT generation, and OTP dispatch.' },
+    { route: '/complaints/*', method: 'GET/POST/PUT', purpose: 'CRUD operations for maintenance tickets and status mutations.' },
+    { route: '/mess/analytics/*', method: 'GET', purpose: 'Aggregation of feedback data for the Public Expose Meter.' },
+    { route: '/bills/*', method: 'GET/PUT', purpose: 'Financial ledger retrieval and administrative settlement execution.' },
+    { route: '/public/live-dashboard/*', method: 'GET', purpose: 'Asynchronous fetch of real-time telemetry for the Command Center.' },
   ];
 
   const stats = [
-    { number: '100%', label: 'Paperwork Eliminated' },
-    { number: '78+', label: 'Features Implemented' },
-    { number: '< 24 Hrs', label: 'Avg. Resolution Time' },
-    { number: '13', label: 'Core Modules' },
+    { number: '100%', label: 'DIGITAL TELEMETRY' },
+    { number: 'ZERO', label: 'LEGACY PAPERWORK' },
+    { number: 'LIVE', label: 'PUBLIC AUDIT CAPABILITY' },
+    { number: 'RBAC', label: 'SECURE ACCESS CONTROL' },
   ];
 
-  const techStack = [
-    { category: 'Frontend', items: 'React • JavaScript • CSS' },
-    { category: 'Backend', items: 'FastAPI • Python • JWT Auth' },
-    { category: 'Database', items: 'PostgreSQL • SQLAlchemy' },
-    { category: 'Real-time', items: 'WebSockets • Live Updates' },
-    { category: 'Cloud', items: 'Cloudinary • Media Storage' },
-    { category: 'Security', items: 'OTP Auth • Role-Based Access' },
-  ];
+  // ==========================================
+  // RENDER LOGIC
+  // ==========================================
 
   return (
-    <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Navbar />
 
-      {/* HERO SECTION */}
-      <div style={{ 
-        backgroundColor: '#FFFFFF',
-        padding: '4rem 2rem',
-        borderBottom: '3px solid #000000',
-        textAlign: 'center',
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ 
-            fontSize: '4rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            margin: 0,
-            marginBottom: '1rem',
-          }}>
-            HostelLife Easy
-          </h1>
-          <div style={{ 
-            fontSize: '1.5rem',
-            fontFamily: 'monospace',
-            marginBottom: '2rem',
-            color: '#666',
-          }}>
-            Digital-First Hostel Management System
+      {/* HERO SECTION - ENTERPRISE HEADER */}
+      <div style={{ backgroundColor: '#FFFFFF', padding: '6rem 2rem', borderBottom: '4px solid #000000', textAlign: 'center', backgroundImage: 'linear-gradient(#F3F4F6 1px, transparent 1px), linear-gradient(90deg, #F3F4F6 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', backgroundColor: '#FFF', padding: '2rem', border: '4px solid #000', boxShadow: '12px 12px 0 #000' }}>
+          <div style={{ display: 'inline-block', backgroundColor: '#000', color: '#FFF', padding: '0.4rem 1rem', fontSize: '1rem', fontFamily: 'monospace', fontWeight: '900', marginBottom: '1.5rem', letterSpacing: '2px' }}>
+            VERSION 1.0.0-STABLE
           </div>
-          <p style={{ 
-            fontSize: '1.1rem',
-            fontFamily: 'monospace',
-            lineHeight: '1.8',
-            maxWidth: '900px',
-            margin: '0 auto',
-            color: '#000',
-          }}>
-            A comprehensive, enterprise-grade hostel management platform built to eliminate paperwork, 
-            speed up maintenance, and optimize hostel life through data-driven decision making and 
-            complete digital accountability.
+          <h1 style={{ fontSize: '4.5rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 1.5rem 0', textTransform: 'uppercase', letterSpacing: '-2px', lineHeight: '1' }}>
+            Hostel Life Easy
+          </h1>
+          <p style={{ fontSize: '1.2rem', fontFamily: 'monospace', lineHeight: '1.8', maxWidth: '900px', margin: '0 auto', color: '#111827', fontWeight: 'bold' }}>
+            A centralized, robust facility management architecture engineered to bridge the operational gap between institutional administration and student residents. HLE digitizes infrastructure monitoring, financial settlements, and resource allocation into a single, cohesive command center.
           </p>
         </div>
       </div>
 
-      {/* STATS BANNER */}
-      <div style={{ 
-        backgroundColor: '#000000',
-        padding: '2rem',
-        borderBottom: '3px solid #000000',
-      }}>
-        <div style={{ 
-          maxWidth: '1400px', 
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '2rem',
-          textAlign: 'center',
-        }}>
+      {/* DATA TELEMETRY BANNER */}
+      <div style={{ backgroundColor: '#000000', padding: '3rem 2rem', borderBottom: '4px solid #000000' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', textAlign: 'center' }}>
           {stats.map((stat, index) => (
-            <div key={index}>
-              <div style={{ 
-                fontSize: '3rem', 
-                fontWeight: 'bold', 
-                fontFamily: 'system-ui', 
-                color: '#FFFFFF',
-                marginBottom: '0.5rem' 
-              }}>
+            <div key={index} style={{ borderRight: index !== stats.length - 1 ? '2px solid #374151' : 'none' }}>
+              <div style={{ fontSize: '4rem', fontWeight: '900', fontFamily: 'system-ui', color: '#FFFFFF', marginBottom: '0.5rem', lineHeight: '1' }}>
                 {stat.number}
               </div>
-              <div style={{ 
-                fontSize: '0.875rem', 
-                fontFamily: 'monospace', 
-                fontWeight: 'bold', 
-                textTransform: 'uppercase',
-                color: '#FFFFFF',
-              }}>
+              <div style={{ fontSize: '0.9rem', fontFamily: 'monospace', fontWeight: '900', textTransform: 'uppercase', color: '#38BDF8', letterSpacing: '1px' }}>
                 {stat.label}
               </div>
             </div>
@@ -161,85 +150,32 @@ const About = () => {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '3rem 2rem' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '4rem 2rem' }}>
 
-        {/* MISSION SECTION */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Our Mission
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
-            <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                The Problem
-              </h3>
-              <p style={{ fontFamily: 'monospace', lineHeight: '1.8', color: '#333', margin: 0 }}>
-                Traditional hostel management relies on manual register books, physical complaint forms, 
-                and warden office visits. This creates bottlenecks, delays resolution, lacks accountability, 
-                and provides no data for informed decision-making. Students face long wait times, 
-                wardens struggle with tracking, and administrations operate without visibility into 
-                recurring maintenance issues.
-              </p>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                Our Solution
-              </h3>
-              <p style={{ fontFamily: 'monospace', lineHeight: '1.8', color: '#333', margin: 0 }}>
-                HLE digitizes the entire hostel management workflow with real-time complaint tracking, 
-                photo verification, voice-enabled reporting, and AI-powered analytics. Every action is 
-                logged, tracked, and made visible to relevant stakeholders. The system identifies problem 
-                patterns through heatmaps, ensures accountability through mandatory photo verification, 
-                and provides complete transparency through a live public dashboard.
-              </p>
-            </div>
+        {/* CORE MODULES SECTION */}
+        <div style={{ marginBottom: '6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '3rem', borderBottom: '4px solid #000000', paddingBottom: '1rem' }}>
+            <div style={{ width: '20px', height: '20px', backgroundColor: '#000' }}></div>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '900', fontFamily: 'system-ui', margin: 0, textTransform: 'uppercase', letterSpacing: '-1px' }}>
+              System Architecture & Modules
+            </h2>
           </div>
-        </div>
-
-        {/* KEY FEATURES */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Key Features
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2.5rem' }}>
             {features.map((feature, index) => (
-              <div 
-                key={index} 
-                style={{ 
-                  backgroundColor: 'white', 
-                  padding: '2rem', 
-                  border: '3px solid #000000',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#EFF6FF';
-                  e.currentTarget.style.borderColor = '#2563EB';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = '#000000';
-                }}
-              >
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{feature.icon}</div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
+              <div key={index} style={{ backgroundColor: 'white', padding: '2.5rem', border: '4px solid #000000', boxShadow: '8px 8px 0 #E5E7EB', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                  <span style={{ backgroundColor: '#000', color: '#FFF', padding: '0.3rem 0.6rem', fontFamily: 'monospace', fontWeight: '900', fontSize: '0.8rem' }}>
+                    {feature.id}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 0.5rem 0', color: '#000' }}>
                   {feature.title}
                 </h3>
-                <p style={{ fontFamily: 'monospace', lineHeight: '1.7', color: '#333', margin: 0, fontSize: '0.95rem' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: '900', fontFamily: 'monospace', margin: '0 0 1.5rem 0', color: '#6B7280', textTransform: 'uppercase' }}>
+                  // {feature.subtitle}
+                </h4>
+                <p style={{ fontFamily: 'monospace', lineHeight: '1.8', color: '#111827', margin: 0, fontSize: '1rem', fontWeight: '500', flex: 1 }}>
                   {feature.description}
                 </p>
               </div>
@@ -247,297 +183,115 @@ const About = () => {
           </div>
         </div>
 
-        {/* TEAM SECTION */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '1rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Meet The Team
-          </h2>
-          <p style={{ 
-            fontFamily: 'monospace', 
-            fontSize: '1rem', 
-            marginBottom: '2rem',
-            color: '#666',
-          }}>
-            BCA 3rd Year Students • Batch 2023-2026 • CUTM Paralakhemundi
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            {teamMembers.map((member, index) => (
-              <div 
-                key={index} 
-                style={{ 
-                  backgroundColor: 'white', 
-                  border: '3px solid #000000',
-                  overflow: 'hidden',
-                  transition: 'all 0.2s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = '8px 8px 0 #000000';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {/* IMAGE PLACEHOLDER */}
-                <div style={{ 
-                  width: '100%', 
-                  height: '300px', 
-                  backgroundColor: '#F3F4F6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderBottom: '3px solid #000000',
-                }}>
-                  <div style={{ 
-                    fontSize: '5rem',
-                    fontFamily: 'monospace',
-                    color: '#000000',
-                  }}>
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </div>
+        {/* SECURITY & API INFRASTRUCTURE (HEAVY TECH DOCS) */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '3rem', marginBottom: '6rem' }}>
+          
+          {/* Security Protocols */}
+          <div style={{ backgroundColor: '#000', color: '#FFF', padding: '3rem', border: '4px solid #000', boxShadow: '12px 12px 0 #E5E7EB' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 2rem 0', textTransform: 'uppercase', color: '#10B981', borderBottom: '2px solid #374151', paddingBottom: '1rem' }}>
+              Security & Compliance
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {securityProtocols.map((protocol, idx) => (
+                <div key={idx}>
+                  <h3 style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: '900', margin: '0 0 0.5rem 0', color: '#FFF' }}>
+                    [ {protocol.title} ]
+                  </h3>
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#9CA3AF', margin: 0, lineHeight: '1.6' }}>
+                    {protocol.detail}
+                  </p>
                 </div>
-                
-                <div style={{ padding: '1.5rem' }}>
-                  <h3 style={{ 
-                    fontSize: '1.25rem', 
-                    fontWeight: 'bold', 
-                    fontFamily: 'system-ui', 
-                    marginBottom: '0.5rem' 
-                  }}>
+              ))}
+            </div>
+          </div>
+
+          {/* API Infrastructure */}
+          <div style={{ backgroundColor: '#FFF', padding: '3rem', border: '4px solid #000', boxShadow: '12px 12px 0 #E5E7EB' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 2rem 0', textTransform: 'uppercase', color: '#000', borderBottom: '4px solid #000', paddingBottom: '1rem' }}>
+              REST API Endpoints
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {apiInfrastructure.map((api, idx) => (
+                <div key={idx} style={{ borderBottom: idx !== apiInfrastructure.length - 1 ? '2px dashed #E5E7EB' : 'none', paddingBottom: idx !== apiInfrastructure.length - 1 ? '1.5rem' : '0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                    <span style={{ backgroundColor: api.method.includes('GET') ? '#DBEAFE' : (api.method.includes('POST') ? '#D1FAE5' : '#FEF3C7'), color: '#000', padding: '0.2rem 0.5rem', fontFamily: 'monospace', fontWeight: '900', fontSize: '0.8rem', border: '2px solid #000' }}>
+                      {api.method}
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: '900', fontSize: '1.1rem' }}>{api.route}</span>
+                  </div>
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4B5563', margin: 0, fontWeight: 'bold' }}>
+                    {api.purpose}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* RELEASE NOTES / CHANGELOG */}
+        <div style={{ marginBottom: '6rem', backgroundColor: '#FFF', padding: '3rem', border: '4px solid #000' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 2rem 0', textTransform: 'uppercase', borderBottom: '4px solid #000', paddingBottom: '1rem' }}>
+            Official Release Notes
+          </h2>
+          <div style={{ fontFamily: 'monospace' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#2563EB', marginBottom: '1rem' }}>v1.0.0-STABLE (Production Launch)</h3>
+            <ul style={{ listStyleType: 'none', padding: 0, margin: 0, lineHeight: '2', fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>
+              <li>[+] Initialized core SQLite/PostgreSQL database schema with 10 normalized tables.</li>
+              <li>[+] Deployed Brutalist Enterprise UI using React.js and dynamic CSS grid structures.</li>
+              <li>[+] Integrated Brevo SMTP engine for secure OTP dispatch protocols.</li>
+              <li>[+] Activated Live Command Center with auto-refreshing telemetry logic.</li>
+              <li>[+] Executed Role-Based Access Control (RBAC) across all frontend views and backend routers.</li>
+              <li>[-] Deprecated legacy voice-complaint modules to enforce strict structural data integrity.</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* TEAM SECTION (EXPANDED) */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', borderBottom: '4px solid #000000', paddingBottom: '1rem' }}>
+            <div style={{ width: '20px', height: '20px', backgroundColor: '#000' }}></div>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '900', fontFamily: 'system-ui', margin: 0, textTransform: 'uppercase', letterSpacing: '-1px' }}>
+              Engineering Team
+            </h2>
+          </div>
+          <p style={{ fontFamily: 'monospace', fontSize: '1rem', marginBottom: '3rem', color: '#4B5563', fontWeight: 'bold', textTransform: 'uppercase' }}>
+            ACADEMIC IDENTIFICATION: BCA 3RD YEAR • BATCH 2023-2026 • CUTM PARALAKHEMUNDI
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            {teamMembers.map((member, index) => (
+              <div key={index} style={{ backgroundColor: 'white', border: '4px solid #000000', borderTop: `8px solid ${member.borderColor}`, boxShadow: '8px 8px 0 #E5E7EB', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ padding: '2rem', flex: 1 }}>
+                  <h3 style={{ fontSize: '1.8rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 0.5rem 0', textTransform: 'uppercase' }}>
                     {member.name}
                   </h3>
-                  <div style={{ 
-                    fontSize: '0.875rem', 
-                    fontFamily: 'monospace', 
-                    fontWeight: 'bold',
-                    color: '#2563EB',
-                    marginBottom: '1rem',
-                  }}>
-                    {member.role}
+                  <div style={{ fontSize: '0.85rem', fontFamily: 'monospace', fontWeight: '900', color: member.borderColor, marginBottom: '1.5rem', backgroundColor: member.bgColor, display: 'inline-block', padding: '0.4rem 0.8rem', border: `2px solid ${member.borderColor}` }}>
+                    [ {member.role.toUpperCase()} ]
                   </div>
-                  <p style={{ 
-                    fontFamily: 'monospace', 
-                    fontSize: '0.875rem', 
-                    lineHeight: '1.6',
-                    color: '#333',
-                    marginBottom: '1rem',
-                  }}>
+                  <p style={{ fontFamily: 'monospace', fontSize: '0.95rem', lineHeight: '1.6', color: '#111827', margin: '0 0 1.5rem 0', fontWeight: 'bold' }}>
                     {member.description}
                   </p>
-                  <div style={{ 
-                    fontSize: '0.75rem', 
-                    fontFamily: 'monospace', 
-                    color: '#666',
-                    padding: '0.5rem',
-                    backgroundColor: '#F9FAFB',
-                    border: '2px solid #E5E7EB',
-                  }}>
-                    {member.skills}
+                  
+                  {/* Detailed Responsibilities List */}
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <strong style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#6B7280', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>Core Operations:</strong>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0, fontFamily: 'monospace', fontSize: '0.85rem', fontWeight: 'bold', color: '#111827', lineHeight: '1.8' }}>
+                      {member.responsibilities.map((resp, i) => (
+                        <li key={i}>&gt; {resp}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* TECH STACK */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Technology Stack
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
-            {techStack.map((tech, index) => (
-              <div key={index} style={{ backgroundColor: 'white', padding: '1.5rem', border: '3px solid #000000' }}>
-                <div style={{ 
-                  fontSize: '0.875rem', 
-                  fontFamily: 'monospace', 
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  color: '#666',
-                  marginBottom: '0.75rem',
-                }}>
-                  {tech.category}
-                </div>
-                <div style={{ fontFamily: 'monospace', fontSize: '0.95rem', color: '#000' }}>
-                  {tech.items}
+                <div style={{ backgroundColor: '#000', padding: '1.5rem', borderTop: '4px solid #000', fontFamily: 'monospace', fontSize: '0.85rem', fontWeight: 'bold', color: '#FFF' }}>
+                  STACK: {member.skills}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* SYSTEM ARCHITECTURE */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            System Architecture
-          </h2>
-          <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem' }}>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                  Core Modules
-                </h3>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>Complaint Management System</li>
-                  <li>User Authentication & Authorization</li>
-                  <li>Role-Based Access Control</li>
-                  <li>Food Management & Analytics</li>
-                  <li>Notice Broadcast System</li>
-                  <li>Bill Management & Tracking</li>
-                  <li>Emergency SOS System</li>
-                  <li>Maintenance Heatmap</li>
-                </ul>
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                  Database Design
-                </h3>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>10 Normalized Tables</li>
-                  <li>Relational Schema Design</li>
-                  <li>Foreign Key Constraints</li>
-                  <li>Optimized Indexing</li>
-                  <li>Transaction Management</li>
-                  <li>Data Integrity Rules</li>
-                  <li>Backup & Recovery System</li>
-                </ul>
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                  Security Features
-                </h3>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>JWT Token Authentication</li>
-                  <li>Email OTP Verification</li>
-                  <li>Password Hashing (bcrypt)</li>
-                  <li>CORS Protection</li>
-                  <li>SQL Injection Prevention</li>
-                  <li>XSS Attack Mitigation</li>
-                  <li>Rate Limiting</li>
-                  <li>Secure Session Management</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* PROJECT SCOPE */}
-        <div style={{ marginBottom: '4rem' }}>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Project Scope & Scale
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                Development Timeline
-              </h3>
-              <ul style={{ fontFamily: 'monospace', fontSize: '0.95rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                <li><strong>Phase 1:</strong> System Architecture & Database Design (2 weeks)</li>
-                <li><strong>Phase 2:</strong> Backend API Development (3 weeks)</li>
-                <li><strong>Phase 3:</strong> Frontend UI Implementation (3 weeks)</li>
-                <li><strong>Phase 4:</strong> Integration & Testing (2 weeks)</li>
-                <li><strong>Phase 5:</strong> Deployment & Documentation (1 week)</li>
-              </ul>
-            </div>
-            <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '1rem' }}>
-                Technical Metrics
-              </h3>
-              <ul style={{ fontFamily: 'monospace', fontSize: '0.95rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                <li><strong>Lines of Code:</strong> 15,000+</li>
-                <li><strong>API Endpoints:</strong> 50+</li>
-                <li><strong>Database Tables:</strong> 10</li>
-                <li><strong>UI Components:</strong> 40+</li>
-                <li><strong>Total Features:</strong> 78+</li>
-                <li><strong>User Roles:</strong> 3 (Student, Warden, Admin)</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* FUTURE ROADMAP */}
-        <div>
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 'bold', 
-            fontFamily: 'system-ui',
-            marginBottom: '2rem',
-            borderBottom: '3px solid #000000',
-            paddingBottom: '1rem',
-          }}>
-            Future Roadmap
-          </h2>
-          <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem' }}>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '0.75rem' }}>
-                  v2.0 Features
-                </h4>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>Mobile App (iOS & Android)</li>
-                  <li>Push Notifications</li>
-                  <li>WhatsApp Integration</li>
-                  <li>Multi-Language Support</li>
-                </ul>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '0.75rem' }}>
-                  AI Enhancements
-                </h4>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>Predictive Maintenance Analytics</li>
-                  <li>Automated Priority Assignment</li>
-                  <li>Smart Room Allocation</li>
-                  <li>Sentiment Trend Analysis</li>
-                </ul>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', fontFamily: 'system-ui', marginBottom: '0.75rem' }}>
-                  Scalability
-                </h4>
-                <ul style={{ fontFamily: 'monospace', fontSize: '0.875rem', lineHeight: '1.8', paddingLeft: '1.5rem' }}>
-                  <li>Multi-Hostel Support</li>
-                  <li>University-Wide Deployment</li>
-                  <li>Cloud Infrastructure</li>
-                  <li>Performance Optimization</li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
 
       </div>
-
       <Footer />
     </div>
   );
