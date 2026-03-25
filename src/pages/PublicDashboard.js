@@ -45,12 +45,14 @@ const PublicDashboard = () => {
   return (
     <div style={{ backgroundColor: '#0B0F19', minHeight: '100vh', color: 'white', fontFamily: 'system-ui, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
-      {/* SCROLLING URGENT TICKER */}
+      {/* SCROLLING SYSTEM NOTICE */}
       {data.notices.length > 0 && (
-        <div style={{ backgroundColor: '#DC2626', color: 'white', padding: '0.5rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-          <div style={{ backgroundColor: '#991B1B', padding: '0.2rem 1rem', marginRight: '1rem', textTransform: 'uppercase', letterSpacing: '2px' }}>LATEST ALERTS</div>
-          <marquee style={{ flex: 1, fontSize: '1.1rem', letterSpacing: '1px' }}>
-            {data.notices.map((n, i) => `⚡ [${n.category}] ${n.title} \u00A0\u00A0\u00A0\u00A0\u00A0`).join(' | \u00A0\u00A0\u00A0\u00A0\u00A0')}
+        <div style={{ backgroundColor: '#1E293B', color: '#94A3B8', padding: '0.5rem', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center' }}>
+          <div style={{ backgroundColor: '#0F172A', color: '#38BDF8', padding: '0.2rem 1rem', marginRight: '1rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold', border: '1px solid #38BDF8' }}>
+            SYSTEM NOTICE
+          </div>
+          <marquee style={{ flex: 1, fontSize: '1rem', letterSpacing: '1px', fontFamily: 'monospace' }}>
+            {data.notices.map((n, i) => `▪ [${n.category.toUpperCase()}] ${n.title} \u00A0\u00A0\u00A0\u00A0\u00A0`).join(' | \u00A0\u00A0\u00A0\u00A0\u00A0')}
           </marquee>
         </div>
       )}
