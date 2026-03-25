@@ -18,11 +18,11 @@ const CreateNotice = () => {
   // Only warden and admin can create notices
   if (!user || (user.role !== 'warden' && user.role !== 'admin')) {
     return (
-      <div>
+      <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh' }}>
         <Navbar />
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>Access Denied</h1>
-          <p>Only wardens and admins can create notices.</p>
+        <div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'monospace' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '1rem', color: '#DC2626' }}>[ ACCESS DENIED ]</h1>
+          <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>UNAUTHORIZED ENTITY. REQUIRES WARDEN OR ADMIN CLEARANCE.</p>
         </div>
       </div>
     );
@@ -45,67 +45,67 @@ const CreateNotice = () => {
       };
 
       await axiosInstance.post('/notices/', noticeData);
-      alert('✅ Notice created successfully!');
+      alert('[SYSTEM] Broadcast transmitted successfully.');
       navigate('/notices');
     } catch (err) {
       console.error('Notice creation error:', err);
       
-      let errorMessage = 'Failed to create notice';
-      
+      let errorMessage = 'FAILED TO TRANSMIT BROADCAST';
       if (err.response?.data?.detail) {
         if (typeof err.response.data.detail === 'string') {
           errorMessage = err.response.data.detail;
         } else if (Array.isArray(err.response.data.detail)) {
           errorMessage = err.response.data.detail.map(e => e.msg || JSON.stringify(e)).join(', ');
-        } else {
-          errorMessage = 'Validation error. Please check all fields.';
         }
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
-      setError(errorMessage);
+      setError(errorMessage.toUpperCase());
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', paddingBottom: '4rem' }}>
       <Navbar />
       <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'system-ui' }}>
-          Create Notice
-        </h1>
-        <p style={{ color: '#6B7280', marginBottom: '2rem', fontFamily: 'monospace' }}>
-          Post a notice for all students
-        </p>
+        
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h1 style={{ fontSize: '3rem', fontWeight: '900', marginBottom: '0.5rem', fontFamily: 'system-ui', textTransform: 'uppercase', letterSpacing: '-1px' }}>
+            Initialize Broadcast
+          </h1>
+          <p style={{ color: '#000', backgroundColor: '#E5E7EB', display: 'inline-block', padding: '0.3rem 0.8rem', border: '2px solid #000', fontFamily: 'monospace', fontWeight: 'bold' }}>
+            TRANSMIT OFFICIAL DIRECTIVES TO ALL TERMINALS
+          </p>
+        </div>
 
-        <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000' }}>
+        <div style={{ backgroundColor: 'white', padding: '3rem', border: '4px solid #000000', boxShadow: '12px 12px 0 #E5E7EB' }}>
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Category *
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                Classification Category *
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white' }}
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: '#F9FAFB', fontWeight: '900', fontSize: '1rem', cursor: 'pointer', outline: 'none' }}
               >
-                <option value="general">General</option>
-                <option value="urgent">Urgent</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="event">Event</option>
-                <option value="exam">Exam</option>
-                <option value="holiday">Holiday</option>
+                <option value="general">GENERAL</option>
+                <option value="urgent">URGENT (CRITICAL PRIORITY)</option>
+                <option value="maintenance">MAINTENANCE</option>
+                <option value="event">EVENT</option>
+                <option value="exam">EXAM</option>
+                <option value="holiday">HOLIDAY</option>
               </select>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Title *
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                Directive Title *
               </label>
               <input
                 type="text"
@@ -113,14 +113,14 @@ const CreateNotice = () => {
                 value={formData.title}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
-                placeholder="Enter notice title"
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontSize: '1.1rem', fontWeight: 'bold', boxSizing: 'border-box', outline: 'none' }}
+                placeholder="e.g. Mandatory Network Outage at 0200 HRS"
               />
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Content *
+            <div style={{ marginBottom: '2.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                Transmission Content *
               </label>
               <textarea
                 name="content"
@@ -128,33 +128,39 @@ const CreateNotice = () => {
                 onChange={handleChange}
                 required
                 rows={8}
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', resize: 'vertical' }}
-                placeholder="Enter notice content..."
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', resize: 'vertical', fontSize: '1rem', fontWeight: '500', boxSizing: 'border-box', outline: 'none' }}
+                placeholder="Enter complete directive details here..."
               />
             </div>
 
             {error && (
-              <div style={{ padding: '0.75rem', backgroundColor: '#FEE2E2', color: '#DC2626', border: '2px solid #DC2626', marginBottom: '1rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
-                {error}
+              <div style={{ padding: '1rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '3px solid #DC2626', marginBottom: '2rem', fontFamily: 'monospace', fontWeight: '900' }}>
+                [ERROR]: {error}
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem' }}>
               <button
                 type="submit"
                 disabled={loading}
                 style={{
-                  flex: 1,
-                  padding: '0.75rem',
+                  flex: 2,
+                  padding: '1rem',
                   backgroundColor: loading ? '#9CA3AF' : '#000000',
                   color: 'white',
-                  border: '2px solid #000000',
+                  border: '4px solid #000000',
                   cursor: loading ? 'not-allowed' : 'pointer',
-                  fontWeight: 'bold',
+                  fontWeight: '900',
                   fontFamily: 'monospace',
+                  fontSize: '1.1rem',
+                  textTransform: 'uppercase',
+                  boxShadow: loading ? 'none' : '6px 6px 0 #000',
+                  transition: 'transform 0.1s'
                 }}
+                onMouseDown={(e) => { if(!loading) e.currentTarget.style.transform = 'translate(2px, 2px)' }}
+                onMouseUp={(e) => { if(!loading) e.currentTarget.style.transform = 'translate(0, 0)' }}
               >
-                {loading ? 'Creating...' : 'Create Notice'}
+                {loading ? 'TRANSMITTING...' : 'EXECUTE BROADCAST'}
               </button>
 
               <button
@@ -162,16 +168,19 @@ const CreateNotice = () => {
                 onClick={() => navigate('/notices')}
                 style={{
                   flex: 1,
-                  padding: '0.75rem',
+                  padding: '1rem',
                   backgroundColor: '#FFFFFF',
                   color: '#000000',
-                  border: '2px solid #000000',
+                  border: '4px solid #000000',
                   cursor: 'pointer',
-                  fontWeight: 'bold',
+                  fontWeight: '900',
                   fontFamily: 'monospace',
+                  fontSize: '1.1rem',
+                  textTransform: 'uppercase',
+                  boxShadow: '6px 6px 0 #E5E7EB'
                 }}
               >
-                Cancel
+                ABORT
               </button>
             </div>
           </form>
