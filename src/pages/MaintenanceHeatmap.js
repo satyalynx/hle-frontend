@@ -10,11 +10,23 @@ const MaintenanceHeatmap = () => {
   const [heatmapData, setHeatmapData] = useState({});
   const [caretakerStats, setCaretakerStats] = useState(null); 
   
-  const [selectedBlock, setSelectedBlock] = useState('A');
+  // 🟢 SMART 7-HOSTEL STATE
+  const [selectedHostel, setSelectedHostel] = useState('1'); 
   const [filter, setFilter] = useState('all');
   const [timeRange, setTimeRange] = useState('30');
   const [selectedRoom, setSelectedRoom] = useState(null); 
   const navigate = useNavigate();
+
+  // 🟢 ACTUAL CUTM HOSTELS CONFIGURATION
+  const hostelsConfig = [
+    { id: '1', name: 'BIJU PATNAIK (BOYS) - BLOCK A', prefix: 'A-' },
+    { id: '2', name: 'BIJU PATNAIK (BOYS) - BLOCK B', prefix: 'B-' },
+    { id: '3', name: 'BIJU PATNAIK (BOYS) - BLOCK C', prefix: 'C-' },
+    { id: '4', name: 'JAGANNATH GIRLS HOSTEL', prefix: '' },
+    { id: '5', name: 'BALABHADRA GIRLS HOSTEL', prefix: '' },
+    { id: '6', name: 'ANNAPURNA GIRLS HOSTEL', prefix: '' },
+    { id: '7', name: 'SUBHADRA GIRLS HOSTEL', prefix: '' },
+  ];
 
   useEffect(() => {
     fetchComplaints();
@@ -26,7 +38,7 @@ const MaintenanceHeatmap = () => {
     } else {
       processHeatmap();
     }
-  }, [complaints, selectedBlock, filter, timeRange, user]);
+  }, [complaints, selectedHostel, filter, timeRange, user]); // Dependency updated
 
   const fetchComplaints = async () => {
     try {
@@ -70,11 +82,24 @@ const MaintenanceHeatmap = () => {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeRange));
 
+    const currentHostel = hostelsConfig.find(h => h.id === selectedHostel);
+    const prefix = currentHostel?.prefix || '';
+
     const filtered = complaints.filter(c => {
       const complaintDate = new Date(c.created_at);
       const matchesTime = complaintDate >= cutoffDate;
       const matchesFilter = filter === 'all' || c.category === filter;
-      const matchesBlock = c.room_number.startsWith(`${selectedBlock}-`);
+      
+      // 🟢 SMART BLOCK MATCHING LOGIC
+      let matchesBlock = false;
+      if (prefix) {
+        // If it's Block A, B, or C, it must start with that prefix
+        matchesBlock = c.room_number.startsWith(prefix);
+      } else {
+        // If it's a girls hostel (no prefix), ensure it has NO prefix at all
+        matchesBlock = !c.room_number.includes('-');
+      }
+
       return matchesTime && matchesFilter && matchesBlock;
     });
 
@@ -192,6 +217,7 @@ const MaintenanceHeatmap = () => {
   // 2. GLOBAL HEATMAP (Admin/Warden)
   // ========================================================
   const totalActiveIssues = Object.values(heatmapData).reduce((sum, room) => sum + room.activeCount, 0);
+  const currentHostelData = hostelsConfig.find(h => h.id === selectedHostel);
 
   return (
     <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', paddingBottom: '3rem' }}>
@@ -212,14 +238,17 @@ const MaintenanceHeatmap = () => {
         {/* Filters Section */}
         <div style={{ backgroundColor: 'white', padding: '1.5rem', border: '3px solid #000000', marginBottom: '2rem', boxShadow: '6px 6px 0 #E5E7EB' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Building Block</label>
-              <select value={selectedBlock} onChange={(e) => setSelectedBlock(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                <option value="A">BLOCK A</option>
-                <option value="B">BLOCK B</option>
-                <option value="C">BLOCK C</option>
+            
+            {/* 🟢 REPLACED: Smart 7-Hostel Dropdown */}
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Facility Location</label>
+              <select value={selectedHostel} onChange={(e) => setSelectedHostel(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer', color: '#111827' }}>
+                {hostelsConfig.map(h => (
+                  <option key={h.id} value={h.id}>{h.name}</option>
+                ))}
               </select>
             </div>
+
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Telemetry Overlay</label>
               <select value={filter} onChange={(e) => setFilter(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
@@ -247,7 +276,7 @@ const MaintenanceHeatmap = () => {
           {/* Building Cross-Section View */}
           <div style={{ flex: '3', backgroundColor: 'white', padding: '3rem 2rem', border: '4px solid #000000', boxShadow: '10px 10px 0 #E5E7EB', overflowX: 'auto' }}>
             <h2 style={{ marginBottom: '2.5rem', fontFamily: 'monospace', fontWeight: '900', textAlign: 'center', borderBottom: '4px solid #000', paddingBottom: '1rem', fontSize: '2rem' }}>
-              HOSTEL BLOCK {selectedBlock}
+              {currentHostelData?.name}
             </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '800px' }}>
@@ -262,7 +291,12 @@ const MaintenanceHeatmap = () => {
                   {/* Rooms Grid for this floor */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '0.5rem', flex: 1 }}>
                     {Array.from({ length: 10 }, (_, i) => {
-                      const roomNum = `${selectedBlock}-${floor.start + i}`;
+                      
+                      // 🟢 SMART ROOM NUMBER FORMATTER FOR GRID
+                      const rawNumber = floor.start + i;
+                      const formattedNum = rawNumber < 10 ? `00${rawNumber}` : (rawNumber === 10 ? `010` : rawNumber);
+                      const roomNum = `${currentHostelData?.prefix}${formattedNum}`;
+                      
                       const stats = heatmapData[roomNum];
                       const bgColor = getHeatColor(stats);
                       const isChronic = stats?.chronic;
@@ -280,7 +314,9 @@ const MaintenanceHeatmap = () => {
                           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '4px 4px 0 #000'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0, 0)'; e.currentTarget.style.boxShadow = isChronic ? '0 0 10px rgba(220, 38, 38, 0.5)' : 'none'; }}
                         >
-                          <span style={{ fontSize: '0.85rem', fontWeight: '900', fontFamily: 'monospace' }}>{floor.start + i}</span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: '900', fontFamily: 'monospace' }}>
+                            {currentHostelData?.prefix}{formattedNum}
+                          </span>
                           
                           {stats?.activeCount > 0 && (
                             <span style={{ fontSize: '1.5rem', fontWeight: '900', marginTop: '0.2rem', fontFamily: 'system-ui' }}>
