@@ -12,21 +12,25 @@ const Register = () => {
     admission_number: '',
     employee_id: '',
     hostel_id: '',
-    department: '', // 🟢 NEW: Added department for caretaker
+    department: '',
+    room_number: '', // 🟢 NEW: Added Room Number field
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // 🟢 FIXED: CUTM's Actual 7 Hostels
   const hostels = [
-    { id: 1, name: 'Boys Hostel A' },
-    { id: 2, name: 'Boys Hostel B' },
-    { id: 3, name: 'Girls Hostel A' },
-    { id: 4, name: 'Girls Hostel B' },
+    { id: 1, name: 'Biju Patnaik Boys Hostel - Block A' },
+    { id: 2, name: 'Biju Patnaik Boys Hostel - Block B' },
+    { id: 3, name: 'Biju Patnaik Boys Hostel - Block C' },
+    { id: 4, name: 'Jagannath Girls Hostel' },
+    { id: 5, name: 'Balabhadra Girls Hostel' },
+    { id: 6, name: 'Annapurna Girls Hostel' },
+    { id: 7, name: 'Subhadra Girls Hostel' },
   ];
 
-  // 🟢 NEW: Departments list for caretakers
   const departments = [
     { id: 'electrical', name: 'Electrical' },
     { id: 'plumbing', name: 'Plumbing' },
@@ -59,21 +63,66 @@ const Register = () => {
 
   const passwordStrength = getPasswordStrength(formData.password);
 
+  // 🟢 NEW: Enterprise Grade Smart Room Normalizer
+  const validateAndFormatRoom = (rawInput, hostelId) => {
+    if (!rawInput) return null;
+    
+    // 1. Extract only numbers from whatever garbage the user typed (e.g. "a-001" -> "001")
+    let digits = rawInput.replace(/\D/g, '');
+    if (!digits) return null;
+    
+    let num = parseInt(digits, 10);
+    let formatted = "";
+
+    // 2. Validate Ranges & Format to 3 digits
+    if (num >= 1 && num <= 10) {
+      // Formats 1 to 001, 10 to 010
+      formatted = `0${num < 10 ? '0' + num : num}`; 
+    } else if (
+      (num >= 101 && num <= 110) ||
+      (num >= 201 && num <= 210) ||
+      (num >= 301 && num <= 310)
+    ) {
+      formatted = num.toString();
+    } else {
+      return null; // Invalid range (e.g., 15, 405)
+    }
+
+    // 3. Apply Hostel Prefix Logic
+    const hId = String(hostelId);
+    if (hId === '1') return `A-${formatted}`; // Biju Block A
+    if (hId === '2') return `B-${formatted}`; // Biju Block B
+    if (hId === '3') return `C-${formatted}`; // Biju Block C
+    
+    return formatted; // Girls Hostels (No prefix)
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    let finalRoomNumber = null;
+
+    // 🟢 Apply Smart Validation for Students
+    if (formData.role === 'student') {
+      finalRoomNumber = validateAndFormatRoom(formData.room_number, formData.hostel_id);
+      if (!finalRoomNumber) {
+        setError("[ INVALID ROOM NUMBER ] Valid floors are: Ground (001-010), 1st (101-110), 2nd (201-210), and 3rd (301-310).");
+        setLoading(false);
+        return;
+      }
+    }
+
     const submitData = {
       ...formData,
-      hostel_id: formData.hostel_id ? parseInt(formData.hostel_id) : null
+      hostel_id: formData.hostel_id ? parseInt(formData.hostel_id) : null,
+      room_number: finalRoomNumber // Pass the cleanly formatted room
     };
 
     try {
-      // Register user
       await axiosInstance.post('/auth/register/', submitData);
       
-      // Auto-login after registration
       const loginData = {
         identifier: submitData.email,
         password: submitData.password
@@ -81,7 +130,6 @@ const Register = () => {
       
       const loginResponse = await axiosInstance.post('/auth/login/', loginData);
       
-      // 🟢 NAYA CODE: Ab hum password bhi parde ke piche bhej rahe hain
       alert('✅ Registration successful! OTP sent to your email.');
       navigate('/login', { state: { email: loginResponse.data.email, password: submitData.password, autoLogin: true } });
       
@@ -94,14 +142,12 @@ const Register = () => {
           errorMessage = err.response.data.detail;
         } else if (Array.isArray(err.response.data.detail)) {
           errorMessage = err.response.data.detail.map(e => e.msg).join(', ');
-        } else {
-          errorMessage = 'Validation error. Please check all fields.';
         }
       } else if (err.message) {
         errorMessage = err.message;
       }
       
-      setError(errorMessage);
+      setError(errorMessage.toUpperCase());
     } finally {
       setLoading(false);
     }
@@ -109,17 +155,17 @@ const Register = () => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#F3F4F6', padding: '2rem' }}>
-      <div style={{ backgroundColor: 'white', padding: '2rem', border: '3px solid #000000', width: '100%', maxWidth: '500px' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem', fontFamily: 'system-ui' }}>
-          Sign up for HLE
+      <div style={{ backgroundColor: 'white', padding: '2.5rem', border: '4px solid #000000', width: '100%', maxWidth: '550px', boxShadow: '12px 12px 0 #E5E7EB' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.5rem', fontFamily: 'system-ui', textTransform: 'uppercase', letterSpacing: '-1px' }}>
+          Terminal Access
         </h1>
-        <p style={{ color: '#6B7280', marginBottom: '2rem', fontFamily: 'monospace' }}>
-          Create your hostel account
+        <p style={{ color: '#000', backgroundColor: '#E5E7EB', display: 'inline-block', padding: '0.3rem 0.8rem', border: '2px solid #000', fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '2rem' }}>
+          INITIALIZE NEW USER PROFILE
         </p>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
               Full Name *
             </label>
             <input
@@ -128,14 +174,14 @@ const Register = () => {
               value={formData.name}
               onChange={handleChange}
               required
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
-              placeholder="Enter your full name"
+              style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
+              placeholder="Enter your legal name"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-              Email *
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+              Email Address *
             </label>
             <input
               type="email"
@@ -143,14 +189,14 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
+              style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
               placeholder="your.email@example.com"
             />
           </div>
 
           <div style={{ marginBottom: '0.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-              Password *
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+              Security Key (Password) *
             </label>
             <div style={{ position: 'relative' }}>
               <input
@@ -160,23 +206,13 @@ const Register = () => {
                 onChange={handleChange}
                 required
                 minLength={8}
-                style={{ width: '100%', padding: '0.75rem', paddingRight: '3rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
-                placeholder="Min 8 characters"
+                style={{ width: '100%', padding: '1rem', paddingRight: '3rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
+                placeholder="Minimum 8 characters"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: 'absolute',
-                  right: '8px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '1.25rem',
-                  padding: '0.5rem',
-                }}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem' }}
               >
                 {showPassword ? '🙈' : '👁️'}
               </button>
@@ -184,33 +220,19 @@ const Register = () => {
           </div>
 
           {formData.password && (
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#6B7280' }}>
-                  Strength:
-                </span>
-                <span style={{ 
-                  fontSize: '0.75rem', 
-                  fontFamily: 'monospace', 
-                  fontWeight: 'bold',
-                  color: passwordStrength.color 
-                }}>
+                <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', color: '#6B7280', fontWeight: 'bold' }}>STRENGTH:</span>
+                <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', fontWeight: '900', color: passwordStrength.color, textTransform: 'uppercase', borderBottom: `2px solid ${passwordStrength.color}` }}>
                   {passwordStrength.strength}
                 </span>
-              </div>
-              <div style={{ fontSize: '0.7rem', color: '#6B7280', fontFamily: 'monospace', lineHeight: '1.4' }}>
-                Password should contain:
-                <br/>• At least 8 characters (12+ recommended)
-                <br/>• Uppercase & lowercase letters
-                <br/>• Numbers (0-9)
-                <br/>• Special characters (!@#$%^&*)
               </div>
             </div>
           )}
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-              Phone Number *
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+              Communication Comms (Phone) *
             </label>
             <input
               type="tel"
@@ -219,69 +241,88 @@ const Register = () => {
               onChange={handleChange}
               required
               pattern="[0-9]{10}"
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
+              style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
               placeholder="10-digit mobile number"
             />
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-              Role *
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+              System Role *
             </label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
               required
-              style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white' }}
+              style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: '900', cursor: 'pointer' }}
             >
-              <option value="student">Student</option>
-              <option value="warden">Warden</option>
-              <option value="caretaker">Caretaker</option> {/* 🟢 NEW: Caretaker option */}
-              <option value="admin">Admin</option>
+              <option value="student">STUDENT RESIDENT</option>
+              <option value="warden">WARDEN (ADMINISTRATION)</option>
+              <option value="caretaker">CARETAKER (MAINTENANCE)</option>
+              <option value="admin">SYSTEM ADMINISTRATOR</option>
             </select>
           </div>
 
-          {/* 🟢 FIXED: Warden, Caretaker, and Student need to select a hostel */}
           {(formData.role === 'student' || formData.role === 'caretaker' || formData.role === 'warden') && (
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Select Hostel *
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                Base Location (Hostel) *
               </label>
               <select
                 name="hostel_id"
                 value={formData.hostel_id}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white' }}
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: '#F9FAFB', fontWeight: '900', cursor: 'pointer' }}
               >
-                <option value="">-- Select your hostel --</option>
+                <option value="">-- SELECT ASSIGNED HOSTEL --</option>
                 {hostels.map((hostel) => (
                   <option key={hostel.id} value={hostel.id}>
-                    {hostel.name}
+                    {hostel.name.toUpperCase()}
                   </option>
                 ))}
               </select>
             </div>
           )}
 
-          {/* 🟢 NEW: Department selection only for caretaker */}
+          {/* 🟢 NEW: Room Number Field for Students */}
+          {formData.role === 'student' && formData.hostel_id && (
+            <div style={{ marginBottom: '1.5rem', backgroundColor: '#EFF6FF', padding: '1rem', border: '3px dashed #2563EB' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase', color: '#1E3A8A' }}>
+                Room Assignment *
+              </label>
+              <input
+                type="text"
+                name="room_number"
+                value={formData.room_number}
+                onChange={handleChange}
+                required
+                style={{ width: '100%', padding: '1rem', border: '3px solid #2563EB', borderRadius: '0', fontFamily: 'monospace', fontWeight: '900', boxSizing: 'border-box' }}
+                placeholder="e.g. 101, A-101, or 1"
+              />
+              <p style={{ fontSize: '0.8rem', color: '#1D4ED8', fontFamily: 'monospace', marginTop: '0.8rem', fontWeight: 'bold', lineHeight: '1.4', margin: '0.8rem 0 0 0' }}>
+                * AI FORMATTER ACTIVE: Just type the digits (e.g. "1" or "105"). The system will automatically detect the floor and apply your hostel block prefix.
+              </p>
+            </div>
+          )}
+
           {formData.role === 'caretaker' && (
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Select Department *
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                Operational Department *
               </label>
               <select
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white' }}
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: '900', cursor: 'pointer' }}
               >
-                <option value="">-- Select your department --</option>
+                <option value="">-- SELECT DEPARTMENT --</option>
                 {departments.map((dept) => (
                   <option key={dept.id} value={dept.id}>
-                    {dept.name}
+                    {dept.name.toUpperCase()}
                   </option>
                 ))}
               </select>
@@ -289,9 +330,9 @@ const Register = () => {
           )}
 
           {formData.role === 'student' && (
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
-                Admission Number *
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                Registration / Roll Number *
               </label>
               <input
                 type="text"
@@ -299,16 +340,15 @@ const Register = () => {
                 value={formData.admission_number}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
-                placeholder="Your admission/roll number"
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
+                placeholder="University Roll Number"
               />
             </div>
           )}
 
-          {/* 🟢 FIXED: Employee ID is needed for Caretaker too */}
           {(formData.role === 'warden' || formData.role === 'admin' || formData.role === 'caretaker') && (
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontFamily: 'monospace' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>
                 Employee ID *
               </label>
               <input
@@ -317,14 +357,14 @@ const Register = () => {
                 value={formData.employee_id}
                 onChange={handleChange}
                 required
-                style={{ width: '100%', padding: '0.75rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace' }}
-                placeholder="Your employee ID"
+                style={{ width: '100%', padding: '1rem', border: '3px solid #000000', borderRadius: '0', fontFamily: 'monospace', fontWeight: 'bold', boxSizing: 'border-box' }}
+                placeholder="Institutional Employee ID"
               />
             </div>
           )}
 
           {error && (
-            <div style={{ padding: '0.75rem', backgroundColor: '#FEE2E2', color: '#DC2626', border: '2px solid #DC2626', marginBottom: '1rem', fontFamily: 'monospace', fontSize: '0.875rem' }}>
+            <div style={{ padding: '1rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '3px solid #DC2626', marginBottom: '1.5rem', fontFamily: 'monospace', fontWeight: '900' }}>
               {error}
             </div>
           )}
@@ -334,22 +374,28 @@ const Register = () => {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '0.75rem',
+              padding: '1rem',
               backgroundColor: loading ? '#9CA3AF' : '#000000',
               color: 'white',
-              border: '2px solid #000000',
+              border: '4px solid #000000',
               cursor: loading ? 'not-allowed' : 'pointer',
-              fontWeight: 'bold',
-              marginBottom: '1rem',
+              fontWeight: '900',
+              marginBottom: '1.5rem',
               fontFamily: 'monospace',
+              fontSize: '1.1rem',
+              textTransform: 'uppercase',
+              boxShadow: loading ? 'none' : '6px 6px 0 #E5E7EB',
+              transition: 'transform 0.1s'
             }}
+            onMouseDown={(e) => { if(!loading) e.currentTarget.style.transform = 'translate(2px, 2px)' }}
+            onMouseUp={(e) => { if(!loading) e.currentTarget.style.transform = 'translate(0, 0)' }}
           >
-            {loading ? 'Creating account...' : 'Sign up'}
+            {loading ? 'INITIALIZING...' : 'EXECUTE REGISTRATION'}
           </button>
 
-          <div style={{ textAlign: 'center', fontFamily: 'monospace' }}>
-            <Link to="/login" style={{ color: '#000000', textDecoration: 'underline' }}>
-              Already have an account? Log in
+          <div style={{ textAlign: 'center', fontFamily: 'monospace', fontWeight: 'bold' }}>
+            <Link to="/login" style={{ color: '#2563EB', textDecoration: 'none', borderBottom: '2px solid #2563EB' }}>
+              ALREADY HAVE CLEARANCE? INITIATE LOGIN
             </Link>
           </div>
         </form>
