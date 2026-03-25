@@ -8,7 +8,7 @@ const MaintenanceHeatmap = () => {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [heatmapData, setHeatmapData] = useState({});
-  const [caretakerStats, setCaretakerStats] = useState(null); // 🟢 NEW: Caretaker specific stats
+  const [caretakerStats, setCaretakerStats] = useState(null); 
   
   const [selectedBlock, setSelectedBlock] = useState('A');
   const [filter, setFilter] = useState('all');
@@ -37,7 +37,6 @@ const MaintenanceHeatmap = () => {
     }
   };
 
-  // 🟢 NEW: CARETAKER PERFORMANCE LOGIC
   const processCaretakerStats = () => {
     const myComplaints = complaints.filter(c => String(c.assigned_to) === String(user?.id));
     
@@ -67,7 +66,6 @@ const MaintenanceHeatmap = () => {
     setCaretakerStats(stats);
   };
 
-  // GLOBAL HEATMAP LOGIC (Admin/Warden)
   const processHeatmap = () => {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeRange));
@@ -124,10 +122,10 @@ const MaintenanceHeatmap = () => {
   ];
 
   // ========================================================
-  // 🟢 1. CARETAKER DASHBOARD (Performance Stand)
+  // 1. CARETAKER DASHBOARD (Performance Stand)
   // ========================================================
   if (user?.role === 'caretaker') {
-    if (!caretakerStats) return <div><Navbar /><div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>[CALCULATING_PERFORMANCE_METRICS...]</div></div>;
+    if (!caretakerStats) return <div><Navbar /><div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>CALCULATING PERFORMANCE METRICS...</div></div>;
 
     const efficiencyRate = caretakerStats.totalAssigned > 0 
       ? Math.round((caretakerStats.resolved / caretakerStats.totalAssigned) * 100) 
@@ -141,7 +139,7 @@ const MaintenanceHeatmap = () => {
           <div style={{ backgroundColor: '#000', color: '#FFF', padding: '3rem', border: '4px solid #000', boxShadow: '12px 12px 0 #E5E7EB', marginBottom: '3rem' }}>
             <h1 style={{ fontSize: '3rem', fontWeight: '900', margin: '0 0 0.5rem 0', textTransform: 'uppercase' }}>Operator Metrics</h1>
             <p style={{ color: '#10B981', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1.2rem' }}>
-              [ID: {user.name}] // ACTIVE_DUTY
+              ID: {user.name} | ACTIVE DUTY
             </p>
           </div>
 
@@ -172,7 +170,7 @@ const MaintenanceHeatmap = () => {
                   <h3 style={{ fontSize: '1.2rem', fontWeight: '900', margin: '0 0 0.5rem 0' }}>{task.title}</h3>
                   <div style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#6B7280', display: 'flex', gap: '1rem', fontWeight: 'bold' }}>
                     <span>ROOM: {task.room_number}</span>
-                    <span>STATUS: {task.status.toUpperCase()}</span>
+                    <span>STATUS: {task.status.replace('_', ' ').toUpperCase()}</span>
                   </div>
                 </div>
                 <button onClick={() => navigate(`/complaints/${task.id}/update-status`)} disabled={task.status === 'review_pending'} style={{ padding: '0.8rem 1.5rem', backgroundColor: task.status === 'review_pending' ? '#E5E7EB' : '#000', color: task.status === 'review_pending' ? '#9CA3AF' : '#FFF', border: '2px solid #000', fontWeight: '900', fontFamily: 'monospace', cursor: task.status === 'review_pending' ? 'not-allowed' : 'pointer' }}>
@@ -181,7 +179,7 @@ const MaintenanceHeatmap = () => {
               </div>
             )) : (
               <div style={{ padding: '3rem', backgroundColor: '#FFF', border: '3px dashed #9CA3AF', textAlign: 'center', fontFamily: 'monospace', fontWeight: 'bold', color: '#6B7280' }}>
-                [NO_ACTIVE_TASKS_IN_QUEUE]
+                NO ACTIVE TASKS IN QUEUE
               </div>
             )}
           </div>
@@ -191,7 +189,7 @@ const MaintenanceHeatmap = () => {
   }
 
   // ========================================================
-  // 🟢 2. GLOBAL HEATMAP (Admin/Warden)
+  // 2. GLOBAL HEATMAP (Admin/Warden)
   // ========================================================
   const totalActiveIssues = Object.values(heatmapData).reduce((sum, room) => sum + room.activeCount, 0);
 
@@ -203,10 +201,10 @@ const MaintenanceHeatmap = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
           <div>
             <h1 style={{ fontSize: '3.5rem', fontWeight: '900', fontFamily: 'system-ui', marginBottom: '0.5rem', letterSpacing: '-1px' }}>
-              🏗️ COMMAND CENTER
+              COMMAND CENTER
             </h1>
             <p style={{ color: '#4B5563', fontFamily: 'monospace', fontSize: '1rem', fontWeight: 'bold', backgroundColor: '#E5E7EB', display: 'inline-block', padding: '0.2rem 0.5rem' }}>
-              LIVE_INFRASTRUCTURE_MONITORING
+              LIVE INFRASTRUCTURE MONITORING
             </p>
           </div>
         </div>
@@ -217,28 +215,28 @@ const MaintenanceHeatmap = () => {
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Building Block</label>
               <select value={selectedBlock} onChange={(e) => setSelectedBlock(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                <option value="A">BLOCK_A</option>
-                <option value="B">BLOCK_B</option>
-                <option value="C">BLOCK_C</option>
+                <option value="A">BLOCK A</option>
+                <option value="B">BLOCK B</option>
+                <option value="C">BLOCK C</option>
               </select>
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Telemetry Overlay</label>
               <select value={filter} onChange={(e) => setFilter(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                <option value="all">GLOBAL_VIEW</option>
-                <option value="electrical">ELECTRICAL_GRID</option>
-                <option value="plumbing">WATER_SUPPLY</option>
-                <option value="carpentry">FURNITURE_STRUCT</option>
+                <option value="all">GLOBAL VIEW</option>
+                <option value="electrical">ELECTRICAL GRID</option>
+                <option value="plumbing">WATER SUPPLY</option>
+                <option value="carpentry">FURNITURE STRUCTURE</option>
                 <option value="cleaning">SANITATION</option>
-                <option value="internet">NETWORK_NODES</option>
+                <option value="internet">NETWORK NODES</option>
               </select>
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '900', fontFamily: 'monospace', textTransform: 'uppercase' }}>Time Horizon</label>
               <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} style={{ width: '100%', padding: '0.8rem', border: '2px solid #000000', borderRadius: '0', fontFamily: 'monospace', backgroundColor: 'white', fontWeight: 'bold', cursor: 'pointer' }}>
-                <option value="7">LAST_7_DAYS</option>
-                <option value="30">LAST_30_DAYS</option>
-                <option value="90">LAST_1_QUARTER</option>
+                <option value="7">LAST 7 DAYS</option>
+                <option value="30">LAST 30 DAYS</option>
+                <option value="90">LAST QUARTER</option>
               </select>
             </div>
           </div>
@@ -249,7 +247,7 @@ const MaintenanceHeatmap = () => {
           {/* Building Cross-Section View */}
           <div style={{ flex: '3', backgroundColor: 'white', padding: '3rem 2rem', border: '4px solid #000000', boxShadow: '10px 10px 0 #E5E7EB', overflowX: 'auto' }}>
             <h2 style={{ marginBottom: '2.5rem', fontFamily: 'monospace', fontWeight: '900', textAlign: 'center', borderBottom: '4px solid #000', paddingBottom: '1rem', fontSize: '2rem' }}>
-              // HOSTEL_BLOCK_{selectedBlock}
+              HOSTEL BLOCK {selectedBlock}
             </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '800px' }}>
@@ -291,8 +289,8 @@ const MaintenanceHeatmap = () => {
                           )}
 
                           {isChronic && (
-                            <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '1.2rem', animation: 'pulse 1.5s infinite', backgroundColor: '#FFF', borderRadius: '50%', border: '2px solid #000' }}>
-                              ⚠️
+                            <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '24px', height: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '0.8rem', fontWeight: '900', color: '#DC2626', animation: 'pulse 1.5s infinite', backgroundColor: '#FFF', borderRadius: '50%', border: '2px solid #000' }}>
+                              !
                             </div>
                           )}
                         </div>
@@ -310,22 +308,22 @@ const MaintenanceHeatmap = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><div style={{ width: '20px', height: '20px', backgroundColor: '#F97316', border: '2px solid #000' }}></div> WARNING (2)</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><div style={{ width: '20px', height: '20px', backgroundColor: '#DC2626', border: '2px solid #000' }}></div> SEVERE (3+)</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><div style={{ width: '20px', height: '20px', backgroundColor: '#991B1B', border: '2px solid #000' }}></div> CRITICAL</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span>⚠️</span> CHRONIC_NODE</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><div style={{ width: '20px', height: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: '900', color: '#DC2626', backgroundColor: '#FFF', borderRadius: '50%', border: '2px solid #000' }}>!</div> CHRONIC NODE</div>
             </div>
           </div>
 
           {/* Quick Insights Sidebar */}
           <div style={{ flex: '1', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div style={{ backgroundColor: '#000', color: '#FFF', padding: '2rem', border: '4px solid #000', boxShadow: '8px 8px 0 #E5E7EB' }}>
-              <h3 style={{ fontFamily: 'monospace', fontWeight: '900', borderBottom: '2px solid #374151', paddingBottom: '0.8rem', marginBottom: '1.5rem', color: '#10B981' }}>
-                // TELEMETRY_SUMMARY
+              <h3 style={{ fontFamily: 'monospace', fontWeight: '900', borderBottom: '2px solid #374151', paddingBottom: '0.8rem', marginBottom: '1.5rem', color: '#10B981', letterSpacing: '1px' }}>
+                TELEMETRY SUMMARY
               </h3>
               <div style={{ marginBottom: '2rem' }}>
-                <div style={{ fontSize: '0.8rem', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>ACTIVE_FAULTS_DETECTED</div>
+                <div style={{ fontSize: '0.8rem', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>ACTIVE FAULTS DETECTED</div>
                 <div style={{ fontSize: '3.5rem', fontWeight: '900', color: '#EF4444', lineHeight: '1' }}>{totalActiveIssues}</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.8rem', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>CHRONIC_NODES (⚠️)</div>
+                <div style={{ fontSize: '0.8rem', color: '#9CA3AF', fontFamily: 'monospace', fontWeight: 'bold' }}>CHRONIC NODES (!)</div>
                 <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#F59E0B', lineHeight: '1' }}>
                   {Object.values(heatmapData).filter(r => r.chronic).length}
                 </div>
@@ -336,45 +334,45 @@ const MaintenanceHeatmap = () => {
         </div>
       </div>
 
-      {/* 🟢 Interactive Room Action Modal (Admin/Warden ONLY) */}
+      {/* Interactive Room Action Modal (Admin/Warden ONLY) */}
       {selectedRoom && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div style={{ backgroundColor: 'white', padding: '3rem', border: '4px solid #000', width: '90%', maxWidth: '600px', maxHeight: '80vh', overflowY: 'auto', boxShadow: '12px 12px 0 #000' }}>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '4px solid #000', paddingBottom: '1rem' }}>
               <h2 style={{ fontSize: '2.5rem', fontWeight: '900', fontFamily: 'monospace', margin: 0 }}>
-                NODE_{selectedRoom.roomNum}
+                NODE {selectedRoom.roomNum}
               </h2>
               <button onClick={() => setSelectedRoom(null)} style={{ background: 'none', border: 'none', fontSize: '2rem', fontWeight: '900', cursor: 'pointer' }}>×</button>
             </div>
 
             {(!selectedRoom.stats || selectedRoom.stats.activeCount === 0) ? (
               <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#ECFDF5', border: '4px solid #10B981', color: '#065F46', fontWeight: '900', fontFamily: 'monospace', fontSize: '1.2rem' }}>
-                [NO_FAULTS_DETECTED_IN_SECTOR]
+                NO FAULTS DETECTED IN SECTOR
               </div>
             ) : (
               <div>
                 {selectedRoom.stats.chronic && (
                   <div style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: '#000', color: '#FBBF24', border: '3px solid #F59E0B', fontWeight: 'bold', fontFamily: 'monospace' }}>
-                    <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '0.5rem' }}>⚠️ CHRONIC ALERT</span>
+                    <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '0.5rem', fontWeight: '900' }}>! CHRONIC ALERT</span>
                     This sector has reported {selectedRoom.stats.count} total issues in the selected timeframe. Root-cause analysis recommended.
                   </div>
                 )}
                 
-                <h3 style={{ fontFamily: 'monospace', marginBottom: '1.5rem', fontWeight: '900', fontSize: '1.2rem', color: '#4B5563' }}>// ACTIVE_TICKETS ({selectedRoom.stats.activeCount})</h3>
+                <h3 style={{ fontFamily: 'monospace', marginBottom: '1.5rem', fontWeight: '900', fontSize: '1.2rem', color: '#4B5563' }}>ACTIVE TICKETS ({selectedRoom.stats.activeCount})</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {selectedRoom.stats.list.filter(c => c.status !== 'resolved' && c.status !== 'closed').map(complaint => (
                     <div key={complaint.id} style={{ border: '3px solid #000', padding: '1.5rem', backgroundColor: '#F9FAFB' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                         <span style={{ fontWeight: '900', fontSize: '1.2rem', fontFamily: 'monospace' }}>#{complaint.id} {complaint.category.toUpperCase()}</span>
                         <span style={{ padding: '0.2rem 0.5rem', backgroundColor: complaint.priority === 'critical' || complaint.priority === 'urgent' ? '#DC2626' : '#10B981', color: 'white', fontSize: '0.8rem', fontWeight: '900', fontFamily: 'monospace', border: '2px solid #000' }}>
-                          {complaint.priority}
+                          {complaint.priority.toUpperCase()}
                         </span>
                       </div>
                       <p style={{ fontFamily: 'system-ui', color: '#111827', marginBottom: '1.5rem', fontWeight: '500', fontSize: '1.1rem' }}>{complaint.title}</p>
                       
                       <button onClick={() => navigate(`/complaints/${complaint.id}`)} style={{ width: '100%', padding: '0.8rem', backgroundColor: '#000', color: 'white', border: 'none', fontWeight: '900', fontFamily: 'monospace', cursor: 'pointer', fontSize: '1rem' }}>
-                        OPEN_TICKET_INTERFACE →
+                        OPEN TICKET INTERFACE →
                       </button>
                     </div>
                   ))}
