@@ -4,14 +4,15 @@ import Footer from '../components/Footer';
 
 const About = () => {
   // ==========================================
-  // DATA STRUCTURES (HEAVY DOCUMENTATION)
+  // DATA STRUCTURES (WITH UPDATED IMAGE PATHS)
   // ==========================================
 
   const teamMembers = [
     {
       name: 'Satya Ranjan Rana',
       role: 'Project Lead & Backend Architect',
-      image: 'S', 
+      // 🟢 UPDATED: Path to your actual photo in public/team/
+      image: '/team/satya.jpg', 
       description: 'Engineered the core REST API, JWT cryptographic security layers, database schema, and asynchronous live telemetry endpoints.',
       responsibilities: ['API Gateway Design', 'Auth Flow (OTP/JWT)', 'Database Migration', 'System Deployment'],
       skills: 'FastAPI • Python • SQLite/PostgreSQL • System Architecture',
@@ -21,7 +22,8 @@ const About = () => {
     {
       name: 'Soumya Srikant Majhi',
       role: 'UI/UX & System Documentation',
-      image: 'M',
+      // 🟢 UPDATED: Path to actual photo
+      image: '/team/soumya.jpg',
       description: 'Designed the brutalist enterprise interface guidelines and compiled comprehensive technical documentation for the entire project lifecycle.',
       responsibilities: ['Wireframing', 'Brutalist UI Guidelines', 'User Flow Optimization', 'Technical Docs'],
       skills: 'UI/UX Design • Figma • Technical Writing • Human-Computer Interaction',
@@ -31,7 +33,8 @@ const About = () => {
     {
       name: 'Krushna Chandra Sahoo',
       role: 'Frontend Development',
-      image: 'K',
+      // 🟢 UPDATED: Path to actual photo
+      image: '/team/krushna.jpg',
       description: 'Implemented modular React components, complex state management, and integrated secure backend APIs with the client interface.',
       responsibilities: ['Component Architecture', 'State Management (Context API)', 'Axios Interceptors', 'Routing'],
       skills: 'React.js • JavaScript (ES6+) • CSS/Inline Styling • DOM Manipulation',
@@ -41,7 +44,8 @@ const About = () => {
     {
       name: 'Subhransu Biswal',
       role: 'Database & Network Ops',
-      image: 'B',
+      // 🟢 UPDATED: Path to actual photo
+      image: '/team/subhransu.jpg',
       description: 'Managed relational database modeling, complex query optimization, cloud hosting deployments, and network routing policies.',
       responsibilities: ['Schema Normalization', 'Index Optimization', 'Server Maintenance', 'Vercel/Render CI/CD'],
       skills: 'Relational Databases • Cloud Ops • CI/CD Pipelines • Network Security',
@@ -73,7 +77,7 @@ const About = () => {
       id: 'MOD-04',
       title: 'SYSTEM BROADCASTS',
       subtitle: 'Emergency & Routine Directives',
-      description: 'An official directive transmission network. Replaces legacy physical notice boards with high-priority digital alerts. Broadcasts are categorized by severity (General, Urgent, Maintenance) and instantly pushed to all registered client terminals to ensure critical information delivery.',
+      description: 'An official directive transmission network. Replaces legacy physical notice boards with high-priority digital alerts categorized by severity (General, Urgent, Maintenance) and instantly pushed to all registered client terminals to ensure critical information delivery.',
     },
   ];
 
@@ -229,25 +233,7 @@ const About = () => {
 
         </div>
 
-        {/* RELEASE NOTES / CHANGELOG */}
-        <div style={{ marginBottom: '6rem', backgroundColor: '#FFF', padding: '3rem', border: '4px solid #000' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 2rem 0', textTransform: 'uppercase', borderBottom: '4px solid #000', paddingBottom: '1rem' }}>
-            Official Release Notes
-          </h2>
-          <div style={{ fontFamily: 'monospace' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#2563EB', marginBottom: '1rem' }}>v1.0.0-STABLE (Production Launch)</h3>
-            <ul style={{ listStyleType: 'none', padding: 0, margin: 0, lineHeight: '2', fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>
-              <li>[+] Initialized core SQLite/PostgreSQL database schema with 10 normalized tables.</li>
-              <li>[+] Deployed Brutalist Enterprise UI using React.js and dynamic CSS grid structures.</li>
-              <li>[+] Integrated Brevo SMTP engine for secure OTP dispatch protocols.</li>
-              <li>[+] Activated Live Command Center with auto-refreshing telemetry logic.</li>
-              <li>[+] Executed Role-Based Access Control (RBAC) across all frontend views and backend routers.</li>
-              <li>[-] Deprecated legacy voice-complaint modules to enforce strict structural data integrity.</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* TEAM SECTION (EXPANDED) */}
+        {/* TEAM SECTION (WITH ACTUAL PHOTOS) */}
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', borderBottom: '4px solid #000000', paddingBottom: '1rem' }}>
             <div style={{ width: '20px', height: '20px', backgroundColor: '#000' }}></div>
@@ -259,9 +245,19 @@ const About = () => {
             ACADEMIC IDENTIFICATION: BCA 3RD YEAR • BATCH 2023-2026 • CUTM PARALAKHEMUNDI
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem' }}>
             {teamMembers.map((member, index) => (
               <div key={index} style={{ backgroundColor: 'white', border: '4px solid #000000', borderTop: `8px solid ${member.borderColor}`, boxShadow: '8px 8px 0 #E5E7EB', display: 'flex', flexDirection: 'column' }}>
+                
+                {/* 🟢 FIXED: Displaying Actual Photo instead of Initials */}
+                <div style={{ width: '100%', height: '300px', backgroundColor: '#F3F4F6', borderBottom: '3px solid #000000', overflow: 'hidden' }}>
+                  <img 
+                    src={member.image} 
+                    alt={member.name} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+
                 <div style={{ padding: '2rem', flex: 1 }}>
                   <h3 style={{ fontSize: '1.8rem', fontWeight: '900', fontFamily: 'system-ui', margin: '0 0 0.5rem 0', textTransform: 'uppercase' }}>
                     {member.name}
