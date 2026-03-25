@@ -53,74 +53,97 @@ const UploadMenu = () => {
         }
       }
 
-      alert('✅ Weekly Timetable updated successfully!');
+      alert('[SYSTEM UPDATE] Weekly timetable updated successfully.');
       navigate('/food'); 
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to update weekly timetable. Please try again.');
+      setError(err.response?.data?.detail || 'FAILED TO UPDATE WEEKLY TIMETABLE. PLEASE RETRY.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ backgroundColor: '#F3F4F6', minHeight: '100vh', paddingBottom: '3rem' }}>
+    <div style={{ backgroundColor: '#F9FAFB', minHeight: '100vh', paddingBottom: '3rem' }}>
       <Navbar />
       <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
         
-        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'system-ui', fontWeight: 'bold', margin: 0, fontSize: '2.5rem' }}>Master Timetable 📅</h1>
-            <p style={{ fontFamily: 'monospace', color: '#6B7280', fontSize: '1.1rem', marginTop: '0.5rem' }}>
-              Fill out the weekly mess routine. Leave cells blank if you don't want to update them right now.
+            <h1 style={{ fontFamily: 'monospace', fontWeight: '900', margin: 0, fontSize: '2.5rem', textTransform: 'uppercase', letterSpacing: '-1px' }}>
+              Master Timetable Configuration
+            </h1>
+            <p style={{ fontFamily: 'monospace', color: '#4B5563', fontSize: '1.1rem', marginTop: '0.5rem', fontWeight: 'bold' }}>
+              DEFINE WEEKLY MESS ROUTINE. BLANK CELLS WILL RETAIN PREVIOUS DATA.
             </p>
           </div>
           <button 
             onClick={handleSubmit} 
             disabled={loading}
-            style={{ padding: '1rem 2rem', backgroundColor: loading ? '#9CA3AF' : '#10B981', color: 'white', border: '3px solid #000', fontWeight: 'bold', fontFamily: 'monospace', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '1.2rem', boxShadow: '4px 4px 0 #000' }}
+            style={{ 
+              padding: '1rem 2.5rem', 
+              backgroundColor: loading ? '#9CA3AF' : '#000000', 
+              color: 'white', 
+              border: '4px solid #000', 
+              fontWeight: '900', 
+              fontFamily: 'monospace', 
+              cursor: loading ? 'not-allowed' : 'pointer', 
+              fontSize: '1.2rem', 
+              boxShadow: loading ? 'none' : '6px 6px 0 #000',
+              textTransform: 'uppercase',
+              transition: 'all 0.1s'
+            }}
+            onMouseDown={(e) => { if(!loading) e.target.style.transform = 'translate(2px, 2px)'; }}
+            onMouseUp={(e) => { if(!loading) e.target.style.transform = 'translate(0, 0)'; }}
           >
-            {loading ? 'UPLOADING...' : '🚀 PUBLISH TIMETABLE'}
+            {loading ? 'EXECUTING...' : 'PUBLISH OVERRIDE'}
           </button>
         </div>
 
         {error && (
-          <div style={{ padding: '1rem', backgroundColor: '#FEE2E2', color: '#DC2626', border: '3px solid #DC2626', fontWeight: 'bold', fontFamily: 'monospace', marginBottom: '2rem', fontSize: '1.1rem' }}>
-            {error}
+          <div style={{ padding: '1.5rem', backgroundColor: '#FEF2F2', color: '#DC2626', border: '4px solid #DC2626', fontWeight: '900', fontFamily: 'monospace', marginBottom: '2.5rem', fontSize: '1.1rem', textTransform: 'uppercase' }}>
+            [ERROR]: {error}
           </div>
         )}
 
-        <div style={{ backgroundColor: 'white', padding: '1rem', border: '3px solid #000', boxShadow: '6px 6px 0 #000', overflowX: 'auto' }}>
+        <div style={{ backgroundColor: 'white', border: '4px solid #000', boxShadow: '8px 8px 0 #000', overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'monospace' }}>
             <thead>
               <tr>
-                <th style={{ border: '2px solid #000', padding: '1rem', backgroundColor: '#000', color: 'white', width: '150px', fontSize: '1.2rem' }}>DAY</th>
-                <th style={{ border: '2px solid #000', padding: '1rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.1rem' }}>🌅 Breakfast</th>
-                <th style={{ border: '2px solid #000', padding: '1rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.1rem' }}>☀️ Lunch</th>
-                <th style={{ border: '2px solid #000', padding: '1rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.1rem' }}>🌙 Dinner</th>
+                <th style={{ borderBottom: '4px solid #000', borderRight: '4px solid #000', padding: '1.5rem', backgroundColor: '#000', color: 'white', width: '150px', fontSize: '1.2rem', fontWeight: '900', textTransform: 'uppercase' }}>DAY</th>
+                <th style={{ borderBottom: '4px solid #000', borderRight: '4px solid #000', padding: '1.5rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.2rem', fontWeight: '900', textTransform: 'uppercase' }}>[ BREAKFAST ]</th>
+                <th style={{ borderBottom: '4px solid #000', borderRight: '4px solid #000', padding: '1.5rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.2rem', fontWeight: '900', textTransform: 'uppercase' }}>[ LUNCH ]</th>
+                <th style={{ borderBottom: '4px solid #000', padding: '1.5rem', backgroundColor: '#F9FAFB', color: '#000', fontSize: '1.2rem', fontWeight: '900', textTransform: 'uppercase' }}>[ DINNER ]</th>
               </tr>
             </thead>
             <tbody>
-              {days.map(day => (
-                <tr key={day}>
-                  <td style={{ border: '2px solid #000', padding: '1rem', fontWeight: 'bold', fontSize: '1.1rem', backgroundColor: '#F3F4F6', textAlign: 'center' }}>
+              {days.map((day, rowIndex) => (
+                <tr key={day} style={{ borderBottom: rowIndex === days.length - 1 ? 'none' : '4px solid #000' }}>
+                  <td style={{ borderRight: '4px solid #000', padding: '1.5rem', fontWeight: '900', fontSize: '1.2rem', backgroundColor: '#F3F4F6', textAlign: 'center', textTransform: 'uppercase' }}>
                     {day}
                   </td>
-                  {meals.map(meal => (
-                    <td key={`${day}-${meal}`} style={{ border: '2px solid #000', padding: '0.5rem', verticalAlign: 'top' }}>
+                  {meals.map((meal, colIndex) => (
+                    <td key={`${day}-${meal}`} style={{ borderRight: colIndex === meals.length - 1 ? 'none' : '4px solid #000', padding: '0', verticalAlign: 'top', backgroundColor: '#FFF' }}>
                       <textarea
                         value={menuData[day][meal]}
                         onChange={(e) => handleCellChange(day, meal, e.target.value)}
-                        placeholder={`e.g. Idli, Sambar`}
-                        rows={3}
+                        placeholder={`Input ${meal} items...`}
+                        rows={4}
                         style={{
                           width: '100%',
-                          padding: '0.5rem',
+                          height: '100%',
+                          boxSizing: 'border-box',
+                          padding: '1rem',
                           border: 'none',
-                          resize: 'vertical',
+                          resize: 'none',
                           fontFamily: 'monospace',
+                          fontSize: '1rem',
+                          fontWeight: 'bold',
                           backgroundColor: 'transparent',
-                          outline: 'none'
+                          outline: 'none',
+                          color: '#111827'
                         }}
+                        onFocus={(e) => { e.target.style.backgroundColor = '#EFF6FF'; }}
+                        onBlur={(e) => { e.target.style.backgroundColor = 'transparent'; }}
                       />
                     </td>
                   ))}
